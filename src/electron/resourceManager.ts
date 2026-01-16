@@ -2,20 +2,21 @@ import osUtils from "os-utils";
 import os from "os";
 import fs from "fs";
 import { BrowserWindow } from "electron";
+import { ipcWebContentsSend } from "./utils.js";
 const POLLING_INTERVAL = 500;
 
 export function pollResources(mainWindow: BrowserWindow) {
   setInterval(async () => {
     const cpuUsage = await getCPUUsage();
     const ramUsage = getRAMUsage();
-    const storageUsage = getStorageData();
-    const staticData = getStaticData();
-    mainWindow.webContents.send("statistics", { cpuUsage, ramUsage, storageUsage})
-    console.log({ cpuUsage, ramUsage, storageUsage, staticData });
+    const storageUsage = getStorageData().usage;
+    // const staticData = getStaticData();
+    ipcWebContentsSend("statistics",mainWindow.webContents, { cpuUsage, ramUsage, storageUsage})
+    // console.log({ cpuUsage, ramUsage, storageUsage, staticData });
   }, POLLING_INTERVAL);
 }
 
-function getCPUUsage() {
+function getCPUUsage():Promise<number> {
   return new Promise((resolve) => {
     osUtils.cpuUsage(resolve); 
   });
