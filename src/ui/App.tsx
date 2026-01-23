@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import { useStatistics } from './useStatistics';
 import { Chart } from './Chart';
+import { UpdateNotification } from './UpdateNotification';
 
 function App() {
   const staticData = useStaticData();
@@ -34,6 +35,7 @@ function App() {
 
   return (
     <div className="App">
+      <UpdateNotification />
       <div className="main">
         <div>
           This is checking for auto updater

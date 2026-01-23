@@ -21,15 +21,30 @@ app.on("ready", () => {
   ipcMainHandle("getStaticData", () => {
     return getStaticData()
   });
-  autoUpdater.checkForUpdatesAndNotify()
+  autoUpdater.autoDownload = false;
+  autoUpdater.checkForUpdatesAndNotify();
 
   autoUpdater.on("checking-for-update", () => {
-    console.log("checking-for-update")
-  })
+    console.log("checking-for-update");
+  });
   autoUpdater.on("update-available", () => {
-    console.log("update-available")
-  })
+    console.log("update-available");
+    mainWindow.webContents.send("update-available");
+  });
   autoUpdater.on("update-downloaded", () => {
-    console.log("update-downloaded")
-  })
+    console.log("update-downloaded");
+    mainWindow.webContents.send("update-downloaded");
+  });
+  autoUpdater.on("download-progress", (progress) => {
+    console.log(`Download speed: ${progress.bytesPerSecond} - Downloaded ${progress.percent}% (${progress.transferred}/${progress.total})`);
+  });
+
+  ipcMainHandle("startDownload", () => {
+    console.log("Starting download...");
+    autoUpdater.downloadUpdate();
+  });
+  ipcMainHandle("installUpdate", () => {
+    console.log("Installing update...");
+    autoUpdater.quitAndInstall();
+  });
 });

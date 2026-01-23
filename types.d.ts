@@ -11,13 +11,17 @@ type StaticData = {
 };
 
 
-type UnsubscribeFunction=()=>void
+type UnsubscribeFunction = () => void
 
 type View = 'CPU' | 'RAM' | 'STORAGE';
 
 type EventPayloadMapping = {
   statistics: Statistics
   getStaticData: StaticData
+  "update-available": void
+  "update-downloaded": void
+  "startDownload": void
+  "installUpdate": void
 }
 
 interface Window {
@@ -26,7 +30,9 @@ interface Window {
       callback: (statistics: Statistics) => void
     ) => UnsubscribeFunction;
     getStaticData: () => Promise<StaticData>;
-
-
+    onUpdateAvailable: (callback: () => void) => UnsubscribeFunction;
+    onUpdateDownloaded: (callback: () => void) => UnsubscribeFunction;
+    startDownload: () => void;
+    installUpdate: () => void;
   };
 }
