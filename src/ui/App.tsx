@@ -1,36 +1,106 @@
-import { useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
+import { useEffect, useMemo, useState } from 'react';
+import './App.css';
+import { useStatistics } from './useStatistics';
+import { Chart } from './Chart';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const staticData = useStaticData();
+  const statistics = useStatistics(10);
+  const [activeView, setActiveView] = useState<View>('CPU');
+  const cpuUsages = useMemo(
+    () => statistics.map((stat) => stat.cpuUsage),
+    [statistics]
+  );
+  const ramUsages = useMemo(
+    () => statistics.map((stat) => stat.ramUsage),
+    [statistics]
+  );
+  const storageUsages = useMemo(
+    () => statistics.map((stat) => stat.storageUsage),
+    [statistics]
+  );
+  const activeUsages = useMemo(() => {
+    switch (activeView) {
+      case 'CPU':
+        return cpuUsages;
+      case 'RAM':
+        return ramUsages;
+      case 'STORAGE':
+        return storageUsages;
+    }
+  }, [activeView, cpuUsages, ramUsages, storageUsages]);
+
+
+
+  return (
+    <div className="App">
+      <div className="main">
+        <div>
+          <SelectOption
+            onClick={() => setActiveView('CPU')}
+            title="CPU"
+            view="CPU"
+            subTitle={staticData?.cpuModel ?? ''}
+            data={cpuUsages}
+          />
+          <SelectOption
+            onClick={() => setActiveView('RAM')}
+            title="RAM"
+            view="RAM"
+            subTitle={(staticData?.totalMemoryGB.toString() ?? '') + ' GB'}
+            data={ramUsages}
+          />
+          <SelectOption
+            onClick={() => setActiveView('STORAGE')}
+            title="STORAGE"
+            view="STORAGE"
+            subTitle={(staticData?.totalStorage.toString() ?? '') + ' GB'}
+            data={storageUsages}
+          />
+        </div>
+        <div className="mainGrid">
+          <Chart
+            selectedView={activeView}
+            data={activeUsages}
+            maxDataPoints={10}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SelectOption(props: {
+  title: string;
+  view: View;
+  subTitle: string;
+  data: number[];
+  onClick: () => void;
+}) {
+  return (
+    <button className="selectOption" onClick={props.onClick}>
+      <div className="selectOptionTitle">
+        <div>{props.title}</div>
+        <div>{props.subTitle}</div>
+      </div>
+      <div className="selectOptionChart">
+        <Chart selectedView={props.view} data={props.data} maxDataPoints={10} />
+      </div>
+    </button>
+  );
+}
+
+
+function useStaticData() {
+  const [staticData, setStaticData] = useState<StaticData | null>(null);
 
   useEffect(() => {
-    const unsub=window.electron.subscribeStatistics((stats) => console.log(stats))
+    (async () => {
+      setStaticData(await window.electron.getStaticData());
+    })();
+  }, []);
 
-    return unsub
-  }, [])
-  return (
-    <>
-      <div>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Faisal HJusai</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  );
+  return staticData;
 }
 
 export default App;

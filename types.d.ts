@@ -13,6 +13,7 @@ type StaticData = {
 
 type UnsubscribeFunction=()=>void
 
+type View = 'CPU' | 'RAM' | 'STORAGE';
 
 type EventPayloadMapping = {
   statistics: Statistics
