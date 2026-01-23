@@ -36,6 +36,9 @@ function App() {
     <div className="App">
       <div className="main">
         <div>
+          This is checking for auto updater
+        </div>
+        <div>
           <SelectOption
             onClick={() => setActiveView('CPU')}
             title="CPU"
