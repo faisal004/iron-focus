@@ -21,8 +21,8 @@ app.on("ready", () => {
   ipcMainHandle("getStaticData", () => {
     return getStaticData()
   });
+  autoUpdater.logger = console;
   autoUpdater.autoDownload = false;
-  autoUpdater.checkForUpdatesAndNotify();
 
   autoUpdater.on("checking-for-update", () => {
     console.log("checking-for-update");
@@ -38,6 +38,9 @@ app.on("ready", () => {
   autoUpdater.on("download-progress", (progress) => {
     console.log(`Download speed: ${progress.bytesPerSecond} - Downloaded ${progress.percent}% (${progress.transferred}/${progress.total})`);
   });
+
+  autoUpdater.checkForUpdatesAndNotify();
+
 
   ipcMainHandle("startDownload", () => {
     console.log("Starting download...");
