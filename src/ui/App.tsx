@@ -38,7 +38,7 @@ function App() {
       <UpdateNotification />
       <div className="main">
         <div style={{ textAlign: 'center', margin: '20px', fontSize: '1.2em', fontWeight: 'bold' }}>
-          System Monitor v0.0.9
+          System Monitor v0.0.11
         </div>
         <div>
           <SelectOption
