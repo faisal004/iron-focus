@@ -11,7 +11,7 @@
     "category": "Utility"
   },
   "win": {
-    "target": ["portable", "msi"]
+    "target": ["nsis"]
   },
   "publish": {
     "provider": "github",
