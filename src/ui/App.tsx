@@ -37,6 +37,9 @@ function App() {
     <div className="App">
       <UpdateNotification />
       <div className="main">
+        <div style={{ textAlign: 'center', margin: '20px', fontSize: '1.2em', fontWeight: 'bold' }}>
+          System Monitor v0.0.9
+        </div>
         <div>
           <SelectOption
             onClick={() => setActiveView('CPU')}
