@@ -63,20 +63,25 @@ app.on("ready", () => {
       mainWindow.webContents.send("download-progress", progress);
     });
 
-    // Check for updates after a short delay to ensure window is ready
-    setTimeout(() => {
-      console.log("Checking for updates...");
-      autoUpdater.checkForUpdates().catch((err) => {
-        console.error("Failed to check for updates:", err);
-        mainWindow.webContents.send("update-error", `Failed to check for updates: ${err.message}`);
-      });
-    }, 3000);
+    // Check for updates after window is fully loaded
+    mainWindow.webContents.on('did-finish-load', () => {
+      console.log("Window loaded, checking for updates in 2 seconds...");
+      setTimeout(() => {
+        console.log("Checking for updates...");
+        autoUpdater.checkForUpdates().catch((err) => {
+          console.error("Failed to check for updates:", err);
+          mainWindow.webContents.send("update-error", `Failed to check for updates: ${err.message}`);
+        });
+      }, 2000);
+    });
   } else {
     console.log("Auto-updater disabled in development mode");
-    // Send a message to UI indicating dev mode
-    setTimeout(() => {
-      mainWindow.webContents.send("update-not-available");
-    }, 1000);
+    // Send a message to UI indicating dev mode after window loads
+    mainWindow.webContents.on('did-finish-load', () => {
+      setTimeout(() => {
+        mainWindow.webContents.send("update-not-available");
+      }, 1000);
+    });
   }
 
   ipcMainHandle("startDownload", () => {

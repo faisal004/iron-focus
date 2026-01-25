@@ -9,13 +9,17 @@ export function UpdateNotification() {
     const [updateAvailable, setUpdateAvailable] = useState(false);
 
     useEffect(() => {
+        console.log("UpdateNotification: Setting up IPC listeners");
+
         const unsubChecking = window.electron.onCheckingForUpdate(() => {
+            console.log("UpdateNotification: Received checking-for-update");
             setStatusMsg("Checking for updates...");
             setShowNotification(true);
             setHasError(false);
         });
 
         const unsubAvailable = window.electron.onUpdateAvailable(() => {
+            console.log("UpdateNotification: Received update-available");
             setStatusMsg("Update available!");
             setShowNotification(true);
             setUpdateAvailable(true);
@@ -23,13 +27,14 @@ export function UpdateNotification() {
         });
 
         const unsubNotAvailable = window.electron.onUpdateNotAvailable(() => {
+            console.log("UpdateNotification: Received update-not-available");
             setStatusMsg("You're on the latest version.");
+            setShowNotification(true);
             setUpdateAvailable(false);
-            // Optionally hide after a delay
-            setTimeout(() => setShowNotification(false), 3000);
         });
 
         const unsubProgress = window.electron.onDownloadProgress((progress) => {
+            console.log("UpdateNotification: Received download-progress", progress);
             const msg = `Downloading: ${progress.percent.toFixed(1)}% (${(progress.transferred / 1024 / 1024).toFixed(1)}MB / ${(progress.total / 1024 / 1024).toFixed(1)}MB)`;
             setStatusMsg(msg);
             setDownloadProgress(progress.percent);
@@ -37,6 +42,7 @@ export function UpdateNotification() {
         });
 
         const unsubDownloaded = window.electron.onUpdateDownloaded(() => {
+            console.log("UpdateNotification: Received update-downloaded");
             setStatusMsg("Update downloaded. Ready to install.");
             setDownloadProgress(null);
             setUpdateReady(true);
@@ -45,6 +51,7 @@ export function UpdateNotification() {
         });
 
         const unsubError = window.electron.onUpdateError((err) => {
+            console.log("UpdateNotification: Received update-error", err);
             setStatusMsg(`Error: ${err}`);
             setShowNotification(true);
             setHasError(true);
