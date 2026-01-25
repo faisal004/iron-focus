@@ -58,6 +58,15 @@ app.on("ready", () => {
       autoUpdater.autoInstallOnAppQuit = true;
       autoUpdater.allowDowngrade = false;
 
+      // Force set the GitHub provider - this is REQUIRED when app.isPackaged is false
+      // or when running from certain build configurations
+      autoUpdater.setFeedURL({
+        provider: "github",
+        owner: "faisal004",
+        repo: "electron"
+      });
+      logger.info("Feed URL configured for GitHub: faisal004/electron");
+
       // Set up event handlers BEFORE any check
       autoUpdater.on("checking-for-update", () => {
         logger.info("EVENT: checking-for-update");
