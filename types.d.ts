@@ -34,6 +34,7 @@ type EventPayloadMapping = {
   "update-error": string
   "startDownload": void
   "installUpdate": void
+  "checkForUpdates": void
 }
 
 interface Window {
@@ -50,5 +51,6 @@ interface Window {
     onUpdateError: (callback: (error: string) => void) => UnsubscribeFunction;
     startDownload: () => void;
     installUpdate: () => void;
+    checkForUpdates: () => void;
   };
 }

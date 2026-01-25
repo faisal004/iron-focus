@@ -118,4 +118,18 @@ app.on("ready", () => {
     }
     return undefined;
   });
+
+  ipcMainHandle("checkForUpdates", () => {
+    console.log("Manual check for updates triggered");
+    if (!isDev()) {
+      mainWindow.webContents.send("checking-for-update");
+      autoUpdater.checkForUpdates().catch((err) => {
+        console.error("Failed to check for updates:", err);
+        mainWindow.webContents.send("update-error", `Failed to check for updates: ${err.message}`);
+      });
+    } else {
+      mainWindow.webContents.send("update-not-available");
+    }
+    return undefined;
+  });
 });

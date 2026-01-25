@@ -76,8 +76,13 @@ export function UpdateNotification() {
         window.electron.installUpdate();
     };
 
-
-
+    const handleCheckForUpdates = () => {
+        console.log("Manual check for updates button clicked");
+        setStatusMsg("Checking for updates...");
+        setShowNotification(true);
+        setHasError(false);
+        window.electron.checkForUpdates();
+    };
 
     return (
         <div style={{
@@ -109,7 +114,11 @@ export function UpdateNotification() {
                 </div>
             )}
 
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                <button onClick={handleCheckForUpdates} style={buttonStyle}>
+                    Check for Updates
+                </button>
+
                 {updateAvailable && (
                     <button onClick={handleDownload} style={buttonStyle}>
                         Download

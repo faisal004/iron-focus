@@ -15,6 +15,7 @@ electron.contextBridge.exposeInMainWorld('electron', {
   onUpdateError: (callback) => ipcOn('update-error', (payload) => callback(payload)),
   startDownload: () => ipcSend('startDownload'),
   installUpdate: () => ipcSend('installUpdate'),
+  checkForUpdates: () => ipcSend('checkForUpdates'),
 } satisfies Window['electron']);
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(
