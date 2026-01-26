@@ -8,19 +8,22 @@ export function UpdateNotification() {
         });
 
         const unsubAvailable = window.electron.onUpdateAvailable(() => {
-            toast.info("Update available! Downloading now...", {
-                duration: 5000,
+            toast.info("Update available!", {
+                description: "A new version of IronFocus is available.",
+                action: {
+                    label: "Download",
+                    onClick: () => window.electron.startDownload(),
+                },
+                duration: Infinity,
             });
         });
 
         const unsubNotAvailable = window.electron.onUpdateNotAvailable(() => {
-            // Optional: toast.success("You are up to date!");
+            toast.success("You are up to date!");
         });
 
         const unsubProgress = window.electron.onDownloadProgress(() => {
-            // We can show a progress toast or just wait for completion
-            // For now, let's keep it quiet to avoid spamming toasts
-            // Or use a persistent toast ID to update progress
+            toast.info("Downloading update...");
         });
 
         const unsubDownloaded = window.electron.onUpdateDownloaded(() => {
