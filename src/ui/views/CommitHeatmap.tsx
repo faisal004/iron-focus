@@ -18,10 +18,10 @@ function getHeatmapLevel(count: number): 0 | 1 | 2 | 3 | 4 {
 
 const LEVEL_COLORS = [
     'bg-muted',
-    'bg-primary/20',
-    'bg-primary/40',
-    'bg-primary/70',
-    'bg-primary',
+    'bg-green-500/20',
+    'bg-green-500/40',
+    'bg-green-500/70',
+    'bg-green-500',
 ] as const;
 
 export function CommitHeatmap() {
@@ -66,7 +66,7 @@ export function CommitHeatmap() {
     }
 
     return (
-        <Card className="border-2 border-primary shadow-none">
+        <Card className="border-2 border-primary shadow-none rounded-none">
             <CardHeader className="border-b-2 border-primary pb-4 bg-muted/20">
                 <CardTitle className="flex items-center gap-2 uppercase tracking-wide">
                     {">"} ACTIVITY_LOG

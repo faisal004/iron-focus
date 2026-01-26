@@ -54,7 +54,7 @@ export function PomodoroTimer() {
         : 0;
 
     return (
-        <Card className="w-full h-full border-4 border-primary shadow-none flex flex-col">
+        <Card className="w-full h-full border-4 border-primary shadow-none flex flex-col rounded-none">
             <CardHeader className="text-center border-b-2 border-primary bg-muted/20 pb-4">
                 <CardTitle className="text-2xl uppercase font-extrabold tracking-widest leading-none">
                     // TIMER_MODULE
@@ -104,7 +104,7 @@ export function PomodoroTimer() {
                                     [ PAUSE ]
                                 </Button>
                             )}
-                            <Button onClick={handleStop} variant="destructive" className="border-2 border-destructive bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded-none uppercase font-bold px-6">
+                            <Button onClick={handleStop} variant="destructive" className="border-2 border-destructive bg-destructive/10 text-destructive hover:bg-destructive hover:text-white rounded-none uppercase font-bold px-6">
                                 [ ABORT ]
                             </Button>
                         </>

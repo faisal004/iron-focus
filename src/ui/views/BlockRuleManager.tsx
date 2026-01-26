@@ -37,7 +37,7 @@ export function BlockRuleManager() {
     }
 
     return (
-        <Card className="border-2 border-primary shadow-none h-full">
+        <Card className="border-2 border-primary shadow-none h-full rounded-none">
             <CardHeader className="border-b-2 border-primary pb-4 bg-muted/20">
                 <CardTitle className="flex items-center gap-2 uppercase tracking-wide">
                     {">"} BLOCKED_PROTOCOLS
@@ -60,7 +60,7 @@ export function BlockRuleManager() {
                                 key={preset.name}
                                 variant="outline"
                                 size="sm"
-                                className="text-xs border-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                                className="text-xs border-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none"
                                 onClick={() => addRule({
                                     type: preset.type as BlockTargetType,
                                     pattern: preset.pattern,
@@ -105,7 +105,7 @@ export function BlockRuleManager() {
                         </div>
                     </div>
                 ) : (
-                    <Button variant="outline" onClick={() => setIsAdding(true)} className="w-full border-2 border-dashed border-primary hover:bg-primary/5 hover:border-solid h-12 uppercase tracking-widest">
+                    <Button variant="outline" onClick={() => setIsAdding(true)} className="w-full border-2 border-dashed border-primary hover:bg-primary/5 hover:border-solid h-12 uppercase tracking-widest rounded-none">
                         + INITIALIZE_NEW_RULE
                     </Button>
                 )}
