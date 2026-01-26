@@ -58,14 +58,18 @@ app.on("ready", () => {
       autoUpdater.autoInstallOnAppQuit = true;
       autoUpdater.allowDowngrade = false;
 
-      // Force set the GitHub provider - this is REQUIRED when app.isPackaged is false
-      // or when running from certain build configurations
+      // CRITICAL: Force update checks even when app.isPackaged is false
+      // This is needed for NSIS builds that may report isPackaged incorrectly
+      autoUpdater.forceDevUpdateConfig = true;
+
+      // Force set the GitHub provider explicitly
       autoUpdater.setFeedURL({
         provider: "github",
         owner: "faisal004",
         repo: "electron"
       });
       logger.info("Feed URL configured for GitHub: faisal004/electron");
+      logger.info("forceDevUpdateConfig:", autoUpdater.forceDevUpdateConfig);
 
       // Set up event handlers BEFORE any check
       autoUpdater.on("checking-for-update", () => {
