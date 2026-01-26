@@ -3,6 +3,7 @@ import './App.css';
 import { useStatistics } from './useStatistics';
 import { Chart } from './Chart';
 import { UpdateNotification } from './UpdateNotification';
+import { Button } from './components/button';
 
 function App() {
   const staticData = useStaticData();
@@ -35,6 +36,7 @@ function App() {
 
   return (
     <div className="App">
+      <Button variant="outline">Button</Button>
       <UpdateNotification />
       <div className="main bg-red-500">
         <div style={{ textAlign: 'center', margin: '20px', fontSize: '1.2em', fontWeight: 'bold' }}>
