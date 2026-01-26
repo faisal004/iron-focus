@@ -17,6 +17,8 @@ IronFocus is a desktop application designed to help you enter and maintain a flo
 
 You can download the latest version from the **[Releases Page](https://github.com/faisal004/electron/releases)**.
 
+> **Note:** IronFocus is currently available for **Windows only**. macOS and Linux support is coming soon.
+
 ### ⚠️ A Note on Windows Installation
 
 When you install IronFocus on Windows, you might see a scary blue warning explicitly saying **"Windows protected your PC"** (SmartScreen).
