@@ -58,9 +58,12 @@ app.on("ready", () => {
       autoUpdater.autoInstallOnAppQuit = true;
       autoUpdater.allowDowngrade = false;
 
-      // CRITICAL: Force update checks even when app.isPackaged is false
-      // This is needed for NSIS builds that may report isPackaged incorrectly
-      autoUpdater.forceDevUpdateConfig = true;
+      // Only force dev update config when app.isPackaged is actually false
+      // This prevents ENOENT errors on properly installed versions
+      if (!app.isPackaged) {
+        logger.info("App is NOT packaged - enabling forceDevUpdateConfig");
+        autoUpdater.forceDevUpdateConfig = true;
+      }
 
       // Force set the GitHub provider explicitly
       autoUpdater.setFeedURL({
