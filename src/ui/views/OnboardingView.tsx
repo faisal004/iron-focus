@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Check, Terminal, Github, Palette } from 'lucide-react';
 import { useTheme } from '../provider/theme-provider';
 import { useSettings } from '../hooks/useSettings';
@@ -39,7 +38,7 @@ export function OnboardingView() {
 
     return (
         <div className="w-screen h-screen bg-background flex items-center justify-center p-4">
-            <Card className="max-w-4xl w-full border-2 border-primary shadow-2xl animate-in fade-in zoom-in duration-500">
+            <Card className="max-w-4xl w-full border-2 border-primary shadow-2xl animate-in fade-in zoom-in duration-500 p-10">
                 <CardHeader className="text-center">
                     <CardTitle className="text-4xl font-bold mb-2 uppercase tracking-widest">{">"}_ Welcome to IronFocus</CardTitle>
                     <CardDescription className="text-xl">
