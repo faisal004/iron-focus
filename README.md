@@ -1,64 +1,42 @@
 # IronFocus 🛡️
 
-Brutally simple productivity and distraction blocking app built with Electron, React, and TypeScript.
+**Brutally simple productivity and distraction blocking.**
 
-Features:
-- **Pomodoro Timer**: Stay focused with timed work sessions.
-- **Distraction Blocking**: Automatically block distracting apps and websites (YouTube, social media, etc.) during focus sessions.
-- **Commit Graph**: Visualize your productivity with a GitHub-style activity heatmap.
-- **Privacy First**: All data stored locally using SQLite.
+IronFocus is a desktop application designed to help you enter and maintain a flow state. It combines a Pomodoro timer with a ruthless distraction blocker and a visual activity log to keep you accountable.
 
-## Development
+![IronFocus Hero](https://github.com/faisal004/electron/assets/placeholder-hero.png)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## ✨ Features
 
-Currently, two official plugins are available:
+-   **🍅 Pomodoro Timer**: Rigid work/break cycles to maintain focus.
+-   **🚫 Distraction Blocking**: configure rules to block websites and applications. If you try to open them during a session, IronFocus will aggressively warn you and fail your session if you persist.
+-   **📊 Activity Heatmap**: Visualize your productivity with a GitHub-style contribution graph. Every successful session is a "commit" to your personal growth.
+-   **🔒 Privacy First**: All data is stored locally on your machine using SQLite. No cloud servers, no tracking.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📥 Download & Installation
 
-## Expanding the ESLint configuration
+You can download the latest version from the **[Releases Page](https://github.com/faisal004/electron/releases)**.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### ⚠️ A Note on Windows Installation
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+When you install IronFocus on Windows, you might see a scary blue warning explicitly saying **"Windows protected your PC"** (SmartScreen).
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**This is normal.** It happens because this is an open-source project and I haven't paid for an expensive code-signing certificate yet.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+**To install:**
+1.  Click **"More info"** on the warning screen.
+2.  Click **"Run anyway"**.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+The application is safe. You can verify this yourself by checking the source code right here in this repository.
+
+## 🛠️ Built With & Safety
+
+IronFocus is built for transparency and reliability.
+
+-   **End-to-End Type Safe**: Built with TypeScript from the database to the UI, ensuring the application is robust and crash-resistant.
+-   **Open Source**: The entire codebase is available for audit. Nothing is hidden.
+-   **Offline-Ready**: Your data never leaves your device.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
