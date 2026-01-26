@@ -2,6 +2,7 @@ import log from "electron-log";
 import type { BlockRuleRepository } from "./database/repositories/blockRuleRepository.js";
 import type { SettingsRepository } from "./database/repositories/settingsRepository.js";
 import { v4 as uuidv4 } from "uuid";
+import activeWindow from "active-win";
 
 const logger = log.scope("blocking");
 
@@ -90,19 +91,19 @@ export class BlockingService {
     }
 
     private async getActiveWindow(): Promise<ActiveWindowInfo | null> {
-        // Platform-specific active window detection
-        // For now, return a stub - will be implemented with native module
         try {
-            // On Windows, we can use active-win package or native bindings
-            // This is a placeholder that returns null - blocking won't work until implemented
+            const result = await activeWindow();
+            if (!result) return null;
 
-            // To enable blocking, install and use active-win:
-            // const activeWin = require('active-win');
-            // const win = await activeWin();
-            // return { processName: win.owner.name, windowTitle: win.title, url: undefined };
-
-            return null;
-        } catch {
+            const winInfo = {
+                processName: result.owner.name,
+                windowTitle: result.title,
+                url: (result as any).url,
+            };
+            logger.info(`Active Window: ${JSON.stringify(winInfo)}`);
+            return winInfo;
+        } catch (error) {
+            logger.error("Failed to get active window:", error);
             return null;
         }
     }
@@ -127,21 +128,55 @@ export class BlockingService {
                 return window.processName.toLowerCase().includes(pattern);
 
             case "domain":
+                // If we have a URL, check hostname
                 if (window.url) {
                     try {
                         const url = new URL(window.url);
                         return url.hostname.toLowerCase().includes(pattern);
                     } catch {
-                        return window.windowTitle.toLowerCase().includes(pattern);
+                        // Invalid URL, fall through to title check
                     }
                 }
-                // Fallback: check window title for domain name
-                return window.windowTitle.toLowerCase().includes(pattern);
+
+                // Fallback: check window title
+                // For "youtube.com", checking if title contains "youtube" is a reasonable heuristic
+                // Use a simplified pattern if it looks like a domain
+                const simplePattern = pattern.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0].split(".")[0];
+                const titleMatch = window.windowTitle.toLowerCase().includes(simplePattern) ||
+                    window.windowTitle.toLowerCase().includes(pattern);
+
+                logger.info(`Checking domain rule '${pattern}' against title '${window.windowTitle}': ${titleMatch}`);
+                return titleMatch;
 
             case "url":
                 if (window.url) {
                     return window.url.toLowerCase().includes(pattern);
                 }
+
+                // Fallback for URL rules without URL data:
+                // Try to match key parts of the URL in the title
+                // e.g. "https://www.youtube.com/" -> match "youtube" in title
+                try {
+                    // Try to parse the pattern as a URL to get the hostname
+                    let hostname = pattern;
+                    try {
+                        const urlObj = new URL(pattern.startsWith("http") ? pattern : `https://${pattern}`);
+                        hostname = urlObj.hostname;
+                    } catch {
+                        // use pattern as is
+                    }
+
+                    // Extract the main part of the domain (e.g. "youtube" from "youtube.com")
+                    const mainPart = hostname.replace(/^www\./, "").split(".")[0];
+                    if (mainPart.length > 3) { // Avoid matching short common words
+                        const match = window.windowTitle.toLowerCase().includes(mainPart);
+                        logger.info(`Checking URL rule '${pattern}' (derived: '${mainPart}') against title '${window.windowTitle}': ${match}`);
+                        return match;
+                    }
+                } catch {
+                    // ignore
+                }
+
                 return window.windowTitle.toLowerCase().includes(pattern);
 
             default:
