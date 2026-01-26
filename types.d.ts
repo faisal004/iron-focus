@@ -94,7 +94,7 @@ type UserSettings = {
   gracePeriodSeconds: number;
   notificationsEnabled: boolean;
   soundEnabled: boolean;
-  theme: 'github-dark' | 'gruvbox' | 'terminal' | 'system';
+  theme: 'github-dark' | 'gruvbox' | 'terminal' | 'system' | 'light';
   hasCompletedOnboarding: boolean;
 };
 

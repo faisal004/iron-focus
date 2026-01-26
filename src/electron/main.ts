@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, powerMonitor, Notification } from "electron";
+import { app, BrowserWindow, Tray, Menu, nativeImage, powerMonitor, Notification, shell } from "electron";
 import path from "path";
 import electronUpdater from "electron-updater";
 const { autoUpdater } = electronUpdater;
@@ -58,9 +58,13 @@ function sendToRenderer(win: BrowserWindow, channel: string, ...args: unknown[])
 }
 
 app.on("ready", () => {
+  // Remove default menu bar
+  Menu.setApplicationMenu(null);
+
   const mainWindow = new BrowserWindow({
     webPreferences: {
-      preload: getPreloadPath()
+      preload: getPreloadPath(),
+      devTools: isDev() // Disable DevTools in production
     }
   });
 
@@ -226,6 +230,11 @@ app.on("ready", () => {
   ipcMainHandleWithArgs<Partial<UserSettings>, UserSettings>("settings:update", (updates) => {
     return settingsRepo.update(updates);
   });
+
+  ipcMainHandleWithArgs<string, void>("openExternal", (url) => {
+    shell.openExternal(url);
+  });
+
 
   // Only run auto-updater in production builds
   if (!isDev()) {

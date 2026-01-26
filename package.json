@@ -2,7 +2,7 @@
   "name": "iron-focus",
   "private": true,
   "description": "IronFocus - Brutally simple productivity and distraction blocking",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {

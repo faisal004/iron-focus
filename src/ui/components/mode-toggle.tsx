@@ -33,6 +33,10 @@ export function ModeToggle() {
                     <Monitor className="mr-2 h-4 w-4" />
                     <span>System</span>
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                    <Sun className="mr-2 h-4 w-4" />
+                    <span>Light</span>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

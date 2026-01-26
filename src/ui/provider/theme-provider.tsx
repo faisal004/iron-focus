@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSettings } from '../hooks/useSettings';
 
-type Theme = 'github-dark' | 'gruvbox' | 'terminal' | 'system';
+type Theme = 'github-dark' | 'gruvbox' | 'terminal' | 'system' | 'light';
 
 type ThemeProviderProps = {
     children: React.ReactNode;
