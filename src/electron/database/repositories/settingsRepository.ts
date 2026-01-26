@@ -5,6 +5,8 @@ const DEFAULT_SETTINGS: UserSettings = {
     gracePeriodSeconds: 10,
     notificationsEnabled: true,
     soundEnabled: true,
+    theme: 'github-dark',
+    hasCompletedOnboarding: false,
 };
 
 type SettingRow = {
@@ -32,8 +34,10 @@ export function createSettingsRepository(db: Database.Database) {
 
                 if (key === "defaultDurationMinutes" || key === "gracePeriodSeconds") {
                     settings[key] = parseInt(value, 10);
-                } else if (key === "notificationsEnabled" || key === "soundEnabled") {
+                } else if (key === "notificationsEnabled" || key === "soundEnabled" || key === "hasCompletedOnboarding") {
                     settings[key] = value === "true";
+                } else if (key === "theme") {
+                    settings[key] = value as UserSettings['theme'];
                 }
             }
 

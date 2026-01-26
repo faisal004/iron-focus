@@ -4,8 +4,24 @@ import { CommitHeatmap } from './views/CommitHeatmap';
 import { BlockRuleManager } from './views/BlockRuleManager';
 import { SettingsView } from './views/SettingsView';
 import { ModeToggle } from './components/mode-toggle';
+import { OnboardingView } from './views/OnboardingView';
+import { useSettings } from './hooks/useSettings';
 
 function App() {
+  const { settings, loading } = useSettings();
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-background text-foreground">
+        Loading...
+      </div>
+    );
+  }
+
+  if (settings && !settings.hasCompletedOnboarding) {
+    return <OnboardingView />;
+  }
+
   return (
     <div className="w-screen h-screen bg-background flex flex-col overflow-hidden">
       <header className="border-b-2 border-primary px-4 py-3 flex items-center justify-between">

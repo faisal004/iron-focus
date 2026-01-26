@@ -39,7 +39,8 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-.dark {
+.dark,
+.github-dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.145 0 0);
@@ -72,6 +73,61 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+}
+
+.gruvbox {
+  --background: oklch(0.18 0.02 90); /* #282828 */
+  --foreground: oklch(0.85 0.05 90); /* #ebdbb2 */
+  --card: oklch(0.18 0.02 90);
+  --card-foreground: oklch(0.85 0.05 90);
+  --popover: oklch(0.18 0.02 90);
+  --popover-foreground: oklch(0.85 0.05 90);
+  --primary: oklch(0.75 0.15 60); /* Oranges/Yellows */
+  --primary-foreground: oklch(0.18 0.02 90);
+  --secondary: oklch(0.25 0.03 90); /* #3c3836 */
+  --secondary-foreground: oklch(0.85 0.05 90);
+  --muted: oklch(0.3 0.03 90); /* #504945 */
+  --muted-foreground: oklch(0.65 0.04 90); /* #a89984 */
+  --accent: oklch(0.75 0.15 60);
+  --accent-foreground: oklch(0.18 0.02 90);
+  --destructive: oklch(0.5 0.2 25); /* Red */
+  --destructive-foreground: oklch(0.85 0.05 90);
+  --border: oklch(0.3 0.03 90);
+  --input: oklch(0.3 0.03 90);
+  --ring: oklch(0.6 0.1 60);
+  --chart-1: oklch(0.75 0.15 60);
+  --chart-2: oklch(0.6 0.15 140); /* Green */
+  --chart-3: oklch(0.7 0.12 180); /* Aqua */
+  --chart-4: oklch(0.5 0.15 280); /* Purple */
+  --chart-5: oklch(0.5 0.2 25); /* Red */
+}
+
+.terminal {
+  --background: oklch(0.05 0 0); /* Near Black */
+  --foreground: oklch(0.8 0.25 140); /* Bright Green */
+  --card: oklch(0.08 0 0);
+  --card-foreground: oklch(0.8 0.25 140);
+  --popover: oklch(0.08 0 0);
+  --popover-foreground: oklch(0.8 0.25 140);
+  --primary: oklch(0.8 0.25 140); /* Green is primary */
+  --primary-foreground: oklch(0.05 0 0);
+  --secondary: oklch(0.15 0 0);
+  --secondary-foreground: oklch(0.8 0.25 140);
+  --muted: oklch(0.15 0 0);
+  --muted-foreground: oklch(0.5 0.15 140);
+  --accent: oklch(0.8 0.25 140);
+  --accent-foreground: oklch(0.05 0 0);
+  --destructive: oklch(0.5 0.2 25); /* Red for errors */
+  --destructive-foreground: oklch(0.9 0 0);
+  --border: oklch(0.3 0.1 140);
+  --input: oklch(0.15 0 0);
+  --ring: oklch(0.8 0.25 140);
+  --chart-1: oklch(0.8 0.25 140);
+  --chart-2: oklch(0.8 0.25 140);
+  --chart-3: oklch(0.8 0.25 140);
+  --chart-4: oklch(0.8 0.25 140);
+  --chart-5: oklch(0.8 0.25 140);
+  font-family: monospace; /* Optional: enforce monospace for terminal feel */
 }
 
 @theme inline {

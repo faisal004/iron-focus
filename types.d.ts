@@ -94,6 +94,8 @@ type UserSettings = {
   gracePeriodSeconds: number;
   notificationsEnabled: boolean;
   soundEnabled: boolean;
+  theme: 'github-dark' | 'gruvbox' | 'terminal' | 'system';
+  hasCompletedOnboarding: boolean;
 };
 
 // === IPC EVENT PAYLOAD MAPPING ===

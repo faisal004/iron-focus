@@ -1,4 +1,4 @@
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, Monitor, Terminal, Palette, Github } from "lucide-react"
 
 import { useTheme } from "../provider/theme-provider"
 import { Button } from "./button"
@@ -17,14 +17,21 @@ export function ModeToggle() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                    Light
+                <DropdownMenuItem onClick={() => setTheme("github-dark")}>
+                    <Github className="mr-2 h-4 w-4" />
+                    <span>GitHub Dark</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                    Dark
+                <DropdownMenuItem onClick={() => setTheme("gruvbox")}>
+                    <Palette className="mr-2 h-4 w-4" />
+                    <span>Gruvbox</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("terminal")}>
+                    <Terminal className="mr-2 h-4 w-4" />
+                    <span>Terminal</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("system")}>
-                    System
+                    <Monitor className="mr-2 h-4 w-4" />
+                    <span>System</span>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
