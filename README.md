@@ -4,7 +4,7 @@
 
 IronFocus is a desktop application designed to help you enter and maintain a flow state. It combines a Pomodoro timer with a ruthless distraction blocker and a visual activity log to keep you accountable.
 
-![IronFocus Hero](https://github.com/faisal004/electron/assets/placeholder-hero.png)
+
 
 ## ✨ Features
 
