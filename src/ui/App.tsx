@@ -9,7 +9,7 @@ function App() {
       <header className="border-b px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold text-foreground">
-            🍅 Focus Mode
+            🛡️ IronFocus
           </h1>
         </div>
       </header>

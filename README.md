@@ -1,4 +1,14 @@
-# React + TypeScript + Vite
+# IronFocus 🛡️
+
+Brutally simple productivity and distraction blocking app built with Electron, React, and TypeScript.
+
+Features:
+- **Pomodoro Timer**: Stay focused with timed work sessions.
+- **Distraction Blocking**: Automatically block distracting apps and websites (YouTube, social media, etc.) during focus sessions.
+- **Commit Graph**: Visualize your productivity with a GitHub-style activity heatmap.
+- **Privacy First**: All data stored locally using SQLite.
+
+## Development
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

@@ -20,7 +20,7 @@ let isQuitting = false;
 function createTray(mainWindow: BrowserWindow) {
   const icon = nativeImage.createFromPath(path.join(getAssetPath(), "tray-icon.png"));
   tray = new Tray(icon);
-  tray.setToolTip("Electron App");
+  tray.setToolTip("IronFocus");
 
   const contextMenu = Menu.buildFromTemplate([
     { label: "Show", click: () => mainWindow.show() },

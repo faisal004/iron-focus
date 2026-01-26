@@ -1,5 +1,6 @@
 {
-  "appId": "com.n-ziermann.electron-course",
+  "appId": "com.faisal004.iron-focus",
+  "productName": "IronFocus",
   "files": ["dist-electron", "dist-react", "dev-app-update.yml"],
   "extraResources": ["dist-electron/preload.cjs", "src/assets/**"],
   "icon": "./desktopIcon.png",
@@ -16,11 +17,12 @@
   "publish": {
     "provider": "github",
     "owner": "faisal004",
-    "repo": "electron"
+    "repo": "iron-focus"
   },
   "nsis": {
     "oneClick": false,
     "perMachine": true,
-    "allowToChangeInstallationDirectory": true
+    "allowToChangeInstallationDirectory": true,
+    "artifactName": "${productName}-Setup-${version}.${ext}"
   }
 }
