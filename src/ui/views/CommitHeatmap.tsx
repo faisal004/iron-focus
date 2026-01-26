@@ -18,10 +18,10 @@ function getHeatmapLevel(count: number): 0 | 1 | 2 | 3 | 4 {
 
 const LEVEL_COLORS = [
     'bg-muted',
-    'bg-green-200 dark:bg-green-900',
-    'bg-green-400 dark:bg-green-700',
-    'bg-green-500 dark:bg-green-600',
-    'bg-green-700 dark:bg-green-500',
+    'bg-primary/20',
+    'bg-primary/40',
+    'bg-primary/70',
+    'bg-primary',
 ] as const;
 
 export function CommitHeatmap() {
@@ -66,32 +66,32 @@ export function CommitHeatmap() {
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    📊 Focus Activity
+        <Card className="border-2 border-primary shadow-none">
+            <CardHeader className="border-b-2 border-primary pb-4 bg-muted/20">
+                <CardTitle className="flex items-center gap-2 uppercase tracking-wide">
+                    {">"} ACTIVITY_LOG
                 </CardTitle>
-                <CardDescription>
-                    <span className="font-medium text-foreground">
-                        🔥 {streak.currentStreak} day streak
+                <CardDescription className="flex items-center font-mono text-xs opacity-70">
+                    <span className="font-bold text-foreground mr-1">
+                        CURRENT_STREAK::{streak.currentStreak}
                     </span>
                     {streak.longestStreak > 0 && (
-                        <span className="ml-2 text-muted-foreground">
-                            (Best: {streak.longestStreak} days)
+                        <span className="text-muted-foreground">
+                            [MAX::{streak.longestStreak}]
                         </span>
                     )}
                 </CardDescription>
             </CardHeader>
-            <CardContent>
-                <div className="overflow-x-auto">
-                    <div className="flex gap-[3px]">
+            <CardContent className="pt-6">
+                <div className="overflow-x-auto pb-2">
+                    <div className="flex gap-[2px]">
                         {weeks.map((week, weekIdx) => (
-                            <div key={weekIdx} className="flex flex-col gap-[3px]">
+                            <div key={weekIdx} className="flex flex-col gap-[2px]">
                                 {week.map((day) => (
                                     <div
                                         key={day.date}
-                                        className={`w-3 h-3 rounded-sm ${LEVEL_COLORS[day.level]}`}
-                                        title={`${day.date}: ${day.count} session${day.count !== 1 ? 's' : ''}`}
+                                        className={`w-3 h-3 ${LEVEL_COLORS[day.level]} hover:border hover:border-foreground/50 transition-colors`}
+                                        title={`${day.date}: ${day.count} SESSIONS`}
                                     />
                                 ))}
                             </div>
@@ -100,12 +100,12 @@ export function CommitHeatmap() {
                 </div>
 
                 {/* Legend */}
-                <div className="flex items-center justify-end gap-1 mt-4 text-xs text-muted-foreground">
-                    <span>Less</span>
+                <div className="flex items-center justify-end gap-1 mt-4 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                    <span>IDLE</span>
                     {LEVEL_COLORS.map((color, i) => (
-                        <div key={i} className={`w-3 h-3 rounded-sm ${color}`} />
+                        <div key={i} className={`w-3 h-3 ${color}`} />
                     ))}
-                    <span>More</span>
+                    <span>MAX_LOAD</span>
                 </div>
             </CardContent>
         </Card>

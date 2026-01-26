@@ -6,10 +6,10 @@ import { BlockRuleManager } from './views/BlockRuleManager';
 function App() {
   return (
     <div className="w-screen h-screen bg-background flex flex-col overflow-hidden">
-      <header className="border-b px-4 py-3 flex items-center justify-between">
+      <header className="border-b-2 border-primary px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-foreground">
-            🛡️ IronFocus
+          <h1 className="text-xl font-bold uppercase tracking-widest">
+            {">"}_ IRON_FOCUS
           </h1>
         </div>
       </header>
