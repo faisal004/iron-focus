@@ -1,10 +1,33 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Tray, Menu, nativeImage } from "electron";
+import path from "path";
 import electronUpdater from "electron-updater";
 const { autoUpdater } = electronUpdater;
 import log from "electron-log";
 import { ipcMainHandle, isDev } from "./utils.js";
 import { getStaticData, pollResources } from "./resourceManager.js";
-import { getPreloadPath, getUIPath } from "./pathResolver.js";
+import { getPreloadPath, getUIPath, getAssetPath } from "./pathResolver.js";
+
+let tray: Tray | null = null;
+let isQuitting = false;
+
+function createTray(mainWindow: BrowserWindow) {
+  const icon = nativeImage.createFromPath(path.join(getAssetPath(), "tray-icon.png"));
+  tray = new Tray(icon);
+  tray.setToolTip("Electron App");
+
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "Show", click: () => mainWindow.show() },
+    {
+      label: "Quit", click: () => {
+        isQuitting = true;
+        app.quit();
+      }
+    }
+  ]);
+
+  tray.setContextMenu(contextMenu);
+  tray.on("double-click", () => mainWindow.show());
+}
 
 // Configure logging - logs will be saved to:
 // Windows: %APPDATA%\electron\logs\main.log
@@ -32,6 +55,17 @@ app.on("ready", () => {
     webPreferences: {
       preload: getPreloadPath()
     }
+  });
+
+  createTray(mainWindow);
+
+  mainWindow.on("close", (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+      mainWindow.hide();
+      return false;
+    }
+    return true;
   });
 
   if (isDev()) {
@@ -202,5 +236,9 @@ app.on("ready", () => {
     }
     return undefined;
   });
+});
+
+app.on("before-quit", () => {
+  isQuitting = true;
 });
 
