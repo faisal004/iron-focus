@@ -3,6 +3,7 @@ import { PomodoroTimer } from './views/PomodoroTimer';
 import { CommitHeatmap } from './views/CommitHeatmap';
 import { BlockRuleManager } from './views/BlockRuleManager';
 import { SettingsView } from './views/SettingsView';
+import { ModeToggle } from './components/mode-toggle';
 
 function App() {
   return (
@@ -13,7 +14,10 @@ function App() {
             {">"}_ IRON_FOCUS
           </h1>
         </div>
-        <SettingsView />
+        <div className="flex items-center gap-4">
+          <SettingsView />
+          <ModeToggle />
+        </div>
       </header>
 
       <UpdateNotification />

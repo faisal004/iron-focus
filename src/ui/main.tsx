@@ -3,10 +3,13 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { Toaster } from './components/sonner'
+import { ThemeProvider } from './provider/theme-provider.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
-    <Toaster />
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <App />
+      <Toaster />
+    </ThemeProvider>
   </StrictMode>,
 )

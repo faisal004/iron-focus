@@ -43,7 +43,7 @@ export function SettingsView() {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="border-2 border-primary hover:bg-primary hover:text-primary-foreground font-mono font-bold uppercase tracking-wider rounded-none">
+                <Button variant="outline" className="border-2 border-primary hover:bg-primary  font-mono font-bold uppercase tracking-wider rounded-none">
                     [ CONFIG ]
                 </Button>
             </DialogTrigger>
