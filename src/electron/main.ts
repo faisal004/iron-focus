@@ -1,11 +1,18 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage } from "electron";
+import { app, BrowserWindow, Tray, Menu, nativeImage, powerMonitor } from "electron";
 import path from "path";
 import electronUpdater from "electron-updater";
 const { autoUpdater } = electronUpdater;
 import log from "electron-log";
-import { ipcMainHandle, isDev } from "./utils.js";
+import { ipcMainHandle, ipcMainHandleWithArgs, isDev, ipcWebContentsSend } from "./utils.js";
 import { getStaticData, pollResources } from "./resourceManager.js";
 import { getPreloadPath, getUIPath, getAssetPath } from "./pathResolver.js";
+import { initDatabase, closeDatabase, getDatabase } from "./database/index.js";
+import { createSessionRepository } from "./database/repositories/sessionRepository.js";
+import { createBlockRuleRepository } from "./database/repositories/blockRuleRepository.js";
+import { createCommitRepository } from "./database/repositories/commitRepository.js";
+import { createSettingsRepository } from "./database/repositories/settingsRepository.js";
+import { PomodoroEngine } from "./pomodoroEngine.js";
+import { BlockingService } from "./blockingService.js";
 
 let tray: Tray | null = null;
 let isQuitting = false;
@@ -75,8 +82,123 @@ app.on("ready", () => {
   }
   pollResources(mainWindow);
 
+  // Initialize database and repositories
+  const db = initDatabase();
+  const sessionRepo = createSessionRepository(db);
+  const blockRuleRepo = createBlockRuleRepository(db);
+  const commitRepo = createCommitRepository(db);
+  const settingsRepo = createSettingsRepository(db);
+
+  // Initialize Pomodoro engine
+  const pomodoroEngine = new PomodoroEngine(
+    sessionRepo,
+    commitRepo,
+    settingsRepo,
+    {
+      onStateChange: (state) => {
+        ipcWebContentsSend("pomodoro:state", mainWindow.webContents, state);
+      },
+      onCompleted: (session) => {
+        blockingService.stopMonitoring();
+        ipcWebContentsSend("pomodoro:completed", mainWindow.webContents, session);
+      },
+      onFailed: (session, reason) => {
+        blockingService.stopMonitoring();
+        ipcWebContentsSend("pomodoro:failed", mainWindow.webContents, { session, reason });
+      },
+    }
+  );
+
+  // Initialize blocking service
+  const blockingService = new BlockingService(
+    blockRuleRepo,
+    settingsRepo,
+    {
+      onWarning: (rule, gracePeriodRemaining) => {
+        pomodoroEngine.incrementViolation();
+        ipcWebContentsSend("blocking:warning", mainWindow.webContents, { rule, gracePeriodRemaining });
+      },
+      onViolation: (event) => {
+        pomodoroEngine.incrementBlockedAppAttempt();
+        pomodoroEngine.failSession(`Blocked activity: ${event.targetName}`);
+        ipcWebContentsSend("blocking:violation", mainWindow.webContents, event);
+      },
+    }
+  );
+
+  // Recover any crashed sessions from previous run
+  pomodoroEngine.recoverCrashedSessions();
+
+  // Handle system resume (wake from sleep)
+  powerMonitor.on("resume", () => {
+    logger.info("System resumed from sleep");
+    pomodoroEngine.handleSystemWake();
+  });
+
   ipcMainHandle("getStaticData", () => {
     return getStaticData();
+  });
+
+  // === POMODORO IPC HANDLERS ===
+  ipcMainHandleWithArgs<{ durationMinutes?: number }, PomodoroSession>("pomodoro:start", (args) => {
+    const session = pomodoroEngine.start(args?.durationMinutes);
+    blockingService.startMonitoring(session.id);
+    return session;
+  });
+
+  ipcMainHandle("pomodoro:stop", () => {
+    blockingService.stopMonitoring();
+    return pomodoroEngine.stop();
+  });
+
+  ipcMainHandle("pomodoro:pause", () => {
+    pomodoroEngine.pause();
+    return undefined;
+  });
+
+  ipcMainHandle("pomodoro:resume", () => {
+    pomodoroEngine.resume();
+    return undefined;
+  });
+
+  // === BLOCKING IPC HANDLERS ===
+  ipcMainHandle("blocking:getRules", () => {
+    return blockingService.getRules();
+  });
+
+  ipcMainHandleWithArgs<Omit<BlockRule, "id" | "createdAt">, BlockRule>("blocking:addRule", (rule) => {
+    return blockingService.addRule(rule);
+  });
+
+  ipcMainHandleWithArgs<{ id: string }, void>("blocking:removeRule", (args) => {
+    blockingService.removeRule(args.id);
+    return undefined;
+  });
+
+  ipcMainHandleWithArgs<BlockRule, BlockRule>("blocking:updateRule", (rule) => {
+    return blockingService.updateRule(rule);
+  });
+
+  // === DATA IPC HANDLERS ===
+  ipcMainHandleWithArgs<{ startDate: string; endDate: string }, DailyCommit[]>("data:getDailyCommits", (args) => {
+    return commitRepo.getByDateRange(args.startDate, args.endDate);
+  });
+
+  ipcMainHandle("data:getStreakStats", () => {
+    return commitRepo.calculateStreak();
+  });
+
+  ipcMainHandleWithArgs<{ limit: number; offset: number }, PomodoroSession[]>("data:getSessionHistory", (args) => {
+    return sessionRepo.findRecent(args.limit, args.offset);
+  });
+
+  // === SETTINGS IPC HANDLERS ===
+  ipcMainHandle("settings:get", () => {
+    return settingsRepo.get();
+  });
+
+  ipcMainHandleWithArgs<Partial<UserSettings>, UserSettings>("settings:update", (updates) => {
+    return settingsRepo.update(updates);
   });
 
   // Only run auto-updater in production builds
@@ -240,5 +362,5 @@ app.on("ready", () => {
 
 app.on("before-quit", () => {
   isQuitting = true;
+  closeDatabase();
 });
-

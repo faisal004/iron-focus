@@ -17,6 +17,18 @@ export function ipcMainHandle<Key extends keyof EventPayloadMapping>(
     return handler();
   });
 }
+
+export function ipcMainHandleWithArgs<Args, Return>(
+  key: string,
+  handler: (args: Args) => Return
+) {
+  ipcMain.handle(key, (event, args: Args) => {
+    if (event.senderFrame) {
+      validateEventFrame(event.senderFrame);
+    }
+    return handler(args);
+  });
+}
 export function ipcWebContentsSend<Key extends keyof EventPayloadMapping>(
   key: Key,
   webContents: WebContents,
@@ -25,7 +37,7 @@ export function ipcWebContentsSend<Key extends keyof EventPayloadMapping>(
   webContents.send(key, payload);
 }
 
-export function validateEventFrame(frame: WebFrameMain ) {
+export function validateEventFrame(frame: WebFrameMain) {
   if (isDev() && new URL(frame.url).host === 'localhost:5123') {
     return;
   }

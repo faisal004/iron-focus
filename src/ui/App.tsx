@@ -3,12 +3,19 @@ import { useStatistics } from './useStatistics';
 import { Chart } from './Chart';
 import { UpdateNotification } from './UpdateNotification';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './components/card';
+import { Button } from './components/button';
 import { cn } from './lib/utils';
+import { PomodoroTimer } from './views/PomodoroTimer';
+import { CommitHeatmap } from './views/CommitHeatmap';
+import { BlockRuleManager } from './views/BlockRuleManager';
+
+type AppView = 'monitor' | 'pomodoro';
 
 function App() {
   const staticData = useStaticData();
   const statistics = useStatistics(10);
-  const [activeView, setActiveView] = useState<View>('CPU');
+  const [activeView, setActiveView] = useState<AppView>('pomodoro');
+  const [activeMonitorView, setActiveMonitorView] = useState<'CPU' | 'RAM' | 'STORAGE'>('CPU');
 
   const cpuUsages = useMemo(
     () => statistics.map((stat) => stat.cpuUsage),
@@ -23,7 +30,7 @@ function App() {
     [statistics]
   );
   const activeUsages = useMemo(() => {
-    switch (activeView) {
+    switch (activeMonitorView) {
       case 'CPU':
         return cpuUsages;
       case 'RAM':
@@ -31,77 +38,106 @@ function App() {
       case 'STORAGE':
         return storageUsages;
     }
-  }, [activeView, cpuUsages, ramUsages, storageUsages]);
+  }, [activeMonitorView, cpuUsages, ramUsages, storageUsages]);
 
   return (
-    <div className="w-screen h-screen bg-background p-4 flex flex-col gap-4 overflow-hidden">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-xl font-bold text-foreground">System Monitor</h1>
-        <p className="text-sm text-muted-foreground">v0.0.23</p>
-      </div>
+    <div className="w-screen h-screen bg-background flex flex-col overflow-hidden">
+      {/* Header with Navigation */}
+      <header className="border-b px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-bold text-foreground">
+            {activeView === 'pomodoro' ? '🍅 Focus Mode' : '📊 System Monitor'}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={activeView === 'pomodoro' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveView('pomodoro')}
+          >
+            Focus
+          </Button>
+          <Button
+            variant={activeView === 'monitor' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveView('monitor')}
+          >
+            Monitor
+          </Button>
+        </div>
+      </header>
 
       {/* Update Notification */}
       <UpdateNotification />
 
       {/* Main Content */}
-      <div className="flex-1 grid grid-cols-[280px_1fr] gap-4 min-h-0">
-        {/* Sidebar - Resource Options */}
-        <div className="flex flex-col gap-3">
-          <SelectOption
-            onClick={() => setActiveView('CPU')}
-            title="CPU"
-            view="CPU"
-            subTitle={staticData?.cpuModel ?? ''}
-            data={cpuUsages}
-            activeView={activeView}
-          />
-          <SelectOption
-            onClick={() => setActiveView('RAM')}
-            title="RAM"
-            view="RAM"
-            subTitle={(staticData?.totalMemoryGB.toString() ?? '') + ' GB'}
-            data={ramUsages}
-            activeView={activeView}
-          />
-          <SelectOption
-            onClick={() => setActiveView('STORAGE')}
-            title="STORAGE"
-            view="STORAGE"
-            subTitle={(staticData?.totalStorage.toString() ?? '') + ' GB'}
-            data={storageUsages}
-            activeView={activeView}
-          />
-        </div>
-
-        {/* Main Chart */}
-        <Card className="flex-1 min-h-0">
-          <CardHeader className="pb-2">
-            <CardTitle>{activeView} Usage</CardTitle>
-            <CardDescription>Real-time {activeView.toLowerCase()} utilization</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 min-h-0 pb-4">
-            <div className="w-full h-full min-h-[200px]">
-              <Chart
-                selectedView={activeView}
-                data={activeUsages}
-                maxDataPoints={10}
+      <main className="flex-1 overflow-auto p-4">
+        {activeView === 'pomodoro' ? (
+          <div className="max-w-4xl mx-auto space-y-6">
+            <PomodoroTimer />
+            <CommitHeatmap />
+            <BlockRuleManager />
+          </div>
+        ) : (
+          <div className="grid grid-cols-[280px_1fr] gap-4 h-full">
+            {/* Sidebar - Resource Options */}
+            <div className="flex flex-col gap-3">
+              <SelectOption
+                onClick={() => setActiveMonitorView('CPU')}
+                title="CPU"
+                view="CPU"
+                subTitle={staticData?.cpuModel ?? ''}
+                data={cpuUsages}
+                activeView={activeMonitorView}
+              />
+              <SelectOption
+                onClick={() => setActiveMonitorView('RAM')}
+                title="RAM"
+                view="RAM"
+                subTitle={(staticData?.totalMemoryGB.toString() ?? '') + ' GB'}
+                data={ramUsages}
+                activeView={activeMonitorView}
+              />
+              <SelectOption
+                onClick={() => setActiveMonitorView('STORAGE')}
+                title="STORAGE"
+                view="STORAGE"
+                subTitle={(staticData?.totalStorage.toString() ?? '') + ' GB'}
+                data={storageUsages}
+                activeView={activeMonitorView}
               />
             </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            {/* Main Chart */}
+            <Card className="flex-1 min-h-0">
+              <CardHeader className="pb-2">
+                <CardTitle>{activeMonitorView} Usage</CardTitle>
+                <CardDescription>Real-time {activeMonitorView.toLowerCase()} utilization</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 min-h-0 pb-4">
+                <div className="w-full h-full min-h-[200px]">
+                  <Chart
+                    selectedView={activeMonitorView}
+                    data={activeUsages}
+                    maxDataPoints={10}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
 
 function SelectOption(props: {
   title: string;
-  view: View;
+  view: 'CPU' | 'RAM' | 'STORAGE';
   subTitle: string;
   data: number[];
   onClick: () => void;
-  activeView: View;
+  activeView: 'CPU' | 'RAM' | 'STORAGE';
 }) {
   const isActive = props.view === props.activeView;
 
