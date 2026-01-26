@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, powerMonitor } from "electron";
+import { app, BrowserWindow, Tray, Menu, nativeImage, powerMonitor, Notification } from "electron";
 import path from "path";
 import electronUpdater from "electron-updater";
 const { autoUpdater } = electronUpdater;
@@ -116,11 +116,33 @@ app.on("ready", () => {
     {
       onWarning: (rule, gracePeriodRemaining) => {
         pomodoroEngine.incrementViolation();
+
+        // Show notification for warning
+        if (Notification.isSupported()) {
+          new Notification({
+            title: "⚠️ Distraction Detected",
+            body: `You are accessing a blocked site. You have ${gracePeriodRemaining}s to close it!`,
+            silent: false,
+            icon: path.join(getAssetPath(), "tray-icon.png") // Fallback icon
+          }).show();
+        }
+
         ipcWebContentsSend("blocking:warning", mainWindow.webContents, { rule, gracePeriodRemaining });
       },
       onViolation: (event) => {
         pomodoroEngine.incrementBlockedAppAttempt();
         pomodoroEngine.failSession(`Blocked activity: ${event.targetName}`);
+
+        // Show notification for violation
+        if (Notification.isSupported()) {
+          new Notification({
+            title: "🚫 Session Failed",
+            body: `IronFocus: Session failed due to ${event.targetName}.`,
+            silent: false,
+            // icon: path.join(getAssetPath(), "tray-icon.png") 
+          }).show();
+        }
+
         ipcWebContentsSend("blocking:violation", mainWindow.webContents, event);
       },
     }
