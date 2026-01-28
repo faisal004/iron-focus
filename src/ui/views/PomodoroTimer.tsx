@@ -63,7 +63,9 @@ export function PomodoroTimer() {
             <CardContent className="space-y-8 pt-8 px-6">
                 {/* Timer Display */}
                 <div className="text-center">
-                    <div className="text-7xl font-mono font-bold text-foreground tracking-tighter tabular-nums decoration-2 underline-offset-4">
+                    <div className="text-7xl font-mono font-bold text-foreground tracking-tighter tabular-nums decoration-2 underline-offset-4"
+                        style={{ fontFamily: '"Orbitron", monospace' }}
+                    >
                         {formatTime(state.remainingSeconds)}
                     </div>
                     {state.session && (
