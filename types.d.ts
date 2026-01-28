@@ -22,6 +22,16 @@ type DownloadProgress = {
   bytesPerSecond: number;
 };
 
+type UpdateInfo = {
+  version: string;
+  files: { url: string; sha512: string; size: number }[];
+  path: string;
+  sha512: string;
+  releaseName?: string;
+  releaseNotes?: string | { version: string; note: string | null }[];
+  releaseDate: string;
+};
+
 // === POMODORO DOMAIN ===
 
 type PomodoroSessionStatus =
@@ -104,7 +114,7 @@ type EventPayloadMapping = {
   // Existing system monitor channels
   statistics: Statistics;
   getStaticData: StaticData;
-  "update-available": void;
+  "update-available": UpdateInfo;
   "update-downloaded": void;
   "checking-for-update": void;
   "update-not-available": void;
@@ -151,7 +161,7 @@ interface Window {
     getStaticData: () => Promise<StaticData>;
 
     // Existing update API
-    onUpdateAvailable: (callback: () => void) => UnsubscribeFunction;
+    onUpdateAvailable: (callback: (info: UpdateInfo) => void) => UnsubscribeFunction;
     onUpdateDownloaded: (callback: () => void) => UnsubscribeFunction;
     onCheckingForUpdate: (callback: () => void) => UnsubscribeFunction;
     onUpdateNotAvailable: (callback: () => void) => UnsubscribeFunction;

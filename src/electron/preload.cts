@@ -9,7 +9,7 @@ electron.contextBridge.exposeInMainWorld('electron', {
   getStaticData: () => ipcInvoke('getStaticData'),
 
   // === UPDATE API ===
-  onUpdateAvailable: (callback: () => void) => ipcOn('update-available', () => callback()),
+  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => ipcOn('update-available', (info) => callback(info)),
   onUpdateDownloaded: (callback: () => void) => ipcOn('update-downloaded', () => callback()),
   onCheckingForUpdate: (callback: () => void) => ipcOn('checking-for-update', () => callback()),
   onUpdateNotAvailable: (callback: () => void) => ipcOn('update-not-available', () => callback()),
