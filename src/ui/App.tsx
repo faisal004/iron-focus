@@ -27,7 +27,7 @@ function App() {
       <header className="border-b-2 border-primary px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold uppercase tracking-widest">
-            {">"}_ IRON_FOCUS
+            {">"}_ GIT_FOCUS
           </h1>
         </div>
         <div className="flex items-center gap-4">

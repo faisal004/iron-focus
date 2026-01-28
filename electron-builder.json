@@ -17,7 +17,7 @@
   "publish": {
     "provider": "github",
     "owner": "faisal004",
-    "repo": "iron-focus"
+    "repo": "git-focus"
   },
   "nsis": {
     "oneClick": false,
