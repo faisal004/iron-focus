@@ -105,6 +105,16 @@ app.on("ready", () => {
       onCompleted: (session) => {
         blockingService.stopMonitoring();
         ipcWebContentsSend("pomodoro:completed", mainWindow.webContents, session);
+
+        // Add notification with action
+        const notification = new Notification({
+          title: "Session Completed",
+          body: "Your focus session has been completed successfully.",
+          actions: [{ type: "button", text: "Start New Session" }],
+          icon: path.join(getAssetPath(), "tray-icon.png")
+        });
+
+        notification.show();
       },
       onFailed: (session, reason) => {
         blockingService.stopMonitoring();
