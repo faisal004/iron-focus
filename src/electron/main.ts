@@ -11,6 +11,7 @@ import { createSessionRepository } from "./database/repositories/sessionReposito
 import { createBlockRuleRepository } from "./database/repositories/blockRuleRepository.js";
 import { createCommitRepository } from "./database/repositories/commitRepository.js";
 import { createSettingsRepository } from "./database/repositories/settingsRepository.js";
+import { createKanbanRepository, KanbanTask, KanbanStatus, KanbanSubtask } from "./database/repositories/kanbanRepository.js";
 import { PomodoroEngine } from "./pomodoroEngine.js";
 import { BlockingService } from "./blockingService.js";
 
@@ -92,6 +93,7 @@ app.on("ready", () => {
   const blockRuleRepo = createBlockRuleRepository(db);
   const commitRepo = createCommitRepository(db);
   const settingsRepo = createSettingsRepository(db);
+  const kanbanRepo = createKanbanRepository(db);
 
   // Initialize Pomodoro engine
   const pomodoroEngine = new PomodoroEngine(
@@ -243,6 +245,52 @@ app.on("ready", () => {
 
   ipcMainHandleWithArgs<string, void>("openExternal", (url) => {
     shell.openExternal(url);
+  });
+
+  // === KANBAN IPC HANDLERS ===
+  ipcMainHandleWithArgs<Omit<KanbanTask, "id" | "createdAt">, KanbanTask>("kanban:createTask", (task) => {
+    return kanbanRepo.create(task);
+  });
+
+  ipcMainHandle("kanban:getTasks", () => {
+    return kanbanRepo.findAll();
+  });
+
+  ipcMainHandleWithArgs<KanbanTask, KanbanTask>("kanban:updateTask", (task) => {
+    return kanbanRepo.update(task);
+  });
+
+  ipcMainHandleWithArgs<{ id: string; status: KanbanStatus }, void>("kanban:updateStatus", (args) => {
+    kanbanRepo.updateStatus(args.id, args.status);
+    return undefined;
+  });
+
+  ipcMainHandleWithArgs<string, void>("kanban:deleteTask", (id) => {
+    kanbanRepo.delete(id);
+    return undefined;
+  });
+
+  ipcMainHandleWithArgs<Omit<KanbanSubtask, "id" | "createdAt" | "completed">, KanbanSubtask>("kanban:createSubtask", (subtask) => {
+    return kanbanRepo.createSubtask(subtask);
+  });
+
+  ipcMainHandleWithArgs<{ id: string; completed: boolean }, void>("kanban:toggleSubtask", (args) => {
+    kanbanRepo.toggleSubtask(args.id, args.completed);
+    return undefined;
+  });
+
+  ipcMainHandleWithArgs<{ id: string; title: string }, void>("kanban:updateSubtaskTitle", (args) => {
+    kanbanRepo.updateSubtaskTitle(args.id, args.title);
+    return undefined;
+  });
+
+  ipcMainHandleWithArgs<string, void>("kanban:deleteSubtask", (id) => {
+    kanbanRepo.deleteSubtask(id);
+    return undefined;
+  });
+
+  ipcMainHandle("kanban:getActivityLog", () => {
+    return kanbanRepo.getActivityLog();
   });
 
 

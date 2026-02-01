@@ -45,6 +45,20 @@ electron.contextBridge.exposeInMainWorld('electron', {
   // === SETTINGS API ===
   getSettings: () => ipcInvoke('settings:get'),
   updateSettings: (settings: Partial<UserSettings>) => ipcInvokeWithArgs('settings:update', settings),
+
+  // === KANBAN API ===
+  createKanbanTask: (task: Omit<KanbanTask, "id" | "createdAt" | "subtasks">) => ipcInvokeWithArgs('kanban:createTask', task),
+  getKanbanTasks: () => ipcInvoke('kanban:getTasks'),
+  updateKanbanTask: (task: KanbanTask) => ipcInvokeWithArgs('kanban:updateTask', task),
+  updateKanbanTaskStatus: (id: string, status: KanbanStatus) => ipcInvokeWithArgs('kanban:updateStatus', { id, status }),
+  deleteKanbanTask: (id: string) => ipcInvokeWithArgs('kanban:deleteTask', id),
+
+  // === SUBTIASK API ===
+  createKanbanSubtask: (subtask: Omit<KanbanSubtask, "id" | "createdAt" | "completed">) => ipcInvokeWithArgs('kanban:createSubtask', subtask),
+  toggleKanbanSubtask: (id: string, completed: boolean) => ipcInvokeWithArgs('kanban:toggleSubtask', { id, completed }),
+  updateKanbanSubtaskTitle: (id: string, title: string) => ipcInvokeWithArgs('kanban:updateSubtaskTitle', { id, title }),
+  deleteKanbanSubtask: (id: string) => ipcInvokeWithArgs('kanban:deleteSubtask', id),
+  getKanbanActivityLog: () => ipcInvoke('kanban:getActivityLog'),
 } satisfies Window['electron']);
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(

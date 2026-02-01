@@ -205,9 +205,6 @@ export function PomodoroTimer() {
                         <Button variant="outline" onClick={() => setShowUpdateDialog(false)}>
                             Later
                         </Button>
-                        <Button onClick={() => window.electron.installUpdate()}>
-                            Update & Restart
-                        </Button>
                     </div>
                 </DialogContent>
             </Dialog>

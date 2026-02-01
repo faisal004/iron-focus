@@ -110,6 +110,30 @@ export function SettingsView() {
                             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
                         </div>
                     </div>
+
+                    <div className="space-y-4 border-t-2 border-primary/20 pt-4">
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-bold uppercase tracking-wide">
+                                UI_STYLE (BOXED_MODE)
+                            </label>
+                            <Button
+                                type="button"
+                                variant={settings?.isBoxed ? "default" : "outline"}
+                                onClick={() => {
+                                    if (settings) updateSettings({ isBoxed: !settings.isBoxed });
+                                }}
+                                className={`
+                                    rounded-none border-2 border-primary font-bold w-24
+                                    ${settings?.isBoxed
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'hover:bg-primary hover:text-primary-foreground'
+                                    }
+                                `}
+                            >
+                                {settings?.isBoxed ? "ON" : "OFF"}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-2">
@@ -127,7 +151,7 @@ export function SettingsView() {
                         [ APPLY_CHANGES ]
                     </Button>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </DialogContent >
+        </Dialog >
     );
 }

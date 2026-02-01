@@ -105,8 +105,42 @@ type UserSettings = {
   notificationsEnabled: boolean;
   soundEnabled: boolean;
   theme: 'github-dark' | 'gruvbox' | 'terminal' | 'system' | 'light';
+  isBoxed: boolean;
   hasCompletedOnboarding: boolean;
 };
+
+// === KANBAN DOMAIN ===
+
+type KanbanStatus = "todo" | "in-progress" | "done";
+
+type KanbanSubtask = {
+  id: string;
+  taskId: string;
+  title: string;
+  completed: boolean;
+  createdAt: number;
+};
+
+type KanbanActivityLog = {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  action: "created" | "moved" | "deleted" | "subtask_added" | "subtask_completed" | "subtask_deleted" | "updated" | "subtask_updated";
+  details: string;
+  createdAt: number;
+};
+
+type KanbanTask = {
+  id: string;
+  title: string;
+  description: string;
+  status: KanbanStatus;
+  dueDate?: number;
+  youtubeLink?: string;
+  createdAt: number;
+  subtasks: KanbanSubtask[];
+};
+
 
 // === IPC EVENT PAYLOAD MAPPING ===
 
@@ -150,6 +184,20 @@ type EventPayloadMapping = {
   // Settings channels
   "settings:get": UserSettings;
   "settings:update": UserSettings;
+
+  // Kanban channels
+  "kanban:createTask": KanbanTask;
+  "kanban:getTasks": KanbanTask[];
+  "kanban:updateTask": KanbanTask;
+  "kanban:updateStatus": void;
+  "kanban:deleteTask": void;
+
+  // Subtask channels
+  "kanban:createSubtask": KanbanSubtask;
+  "kanban:toggleSubtask": void;
+  "kanban:updateSubtaskTitle": void;
+  "kanban:deleteSubtask": void;
+  "kanban:getActivityLog": KanbanActivityLog[];
 };
 
 interface Window {
@@ -197,6 +245,20 @@ interface Window {
     // Settings API
     getSettings: () => Promise<UserSettings>;
     updateSettings: (settings: Partial<UserSettings>) => Promise<UserSettings>;
+
+    // Kanban API
+    createKanbanTask: (task: Omit<KanbanTask, "id" | "createdAt" | "subtasks">) => Promise<KanbanTask>;
+    getKanbanTasks: () => Promise<KanbanTask[]>;
+    updateKanbanTask: (task: KanbanTask) => Promise<KanbanTask>;
+    updateKanbanTaskStatus: (id: string, status: KanbanStatus) => Promise<void>;
+    deleteKanbanTask: (id: string) => Promise<void>;
+
+    // Subtask API
+    createKanbanSubtask: (subtask: Omit<KanbanSubtask, "id" | "createdAt" | "completed">) => Promise<KanbanSubtask>;
+    toggleKanbanSubtask: (id: string, completed: boolean) => Promise<void>;
+    updateKanbanSubtaskTitle: (id: string, title: string) => Promise<void>;
+    deleteKanbanSubtask: (id: string) => Promise<void>;
+    getKanbanActivityLog: () => Promise<KanbanActivityLog[]>;
   };
 }
 
