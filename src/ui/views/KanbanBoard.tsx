@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Calendar, CheckSquare, Square, X, History, Link as LinkIcon, ExternalLink } from "lucide-react";
+import { ScrollArea } from "../components/scroll-area";
 
 // Types are globally available via types.d.ts
 
@@ -308,9 +309,9 @@ export function KanbanBoard() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full overflow-hidden">
                 {columns.map((col) => (
-                    <div
+                    <ScrollArea
                         key={col.id}
-                        className={`flex flex-col h-full bg-muted/30 rounded-lg p-4 border transition-colors ${draggedTaskId ? "border-primary/30 bg-muted/50" : "border-border/50"
+                        className={`flex flex-col h-full bg-muted/30 rounded-lg p-4 border overflow-y-auto transition-colors ${draggedTaskId ? "border-primary/30 bg-muted/50" : "border-border/50"
                             }`}
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, col.id)}
@@ -435,7 +436,7 @@ export function KanbanBoard() {
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </ScrollArea>
                 ))}
             </div>
         </div>
