@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Calendar, CheckSquare, Square, X, History, Link as LinkIcon, ExternalLink } from "lucide-react";
+import { Plus, Trash2, Calendar, CheckSquare, Square, X, History, Link as LinkIcon, ExternalLink, ChevronRight, ChevronDown } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/sheet";
 import { ScrollArea } from "../components/scroll-area";
 
 // Types are globally available via types.d.ts
@@ -13,7 +14,6 @@ export function KanbanBoard() {
     const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
     const [logs, setLogs] = useState<KanbanActivityLog[]>([]);
-    const [showLogs, setShowLogs] = useState(false);
     const [newSubtaskTitles, setNewSubtaskTitles] = useState<Record<string, string>>({});
 
     useEffect(() => {
@@ -38,14 +38,6 @@ export function KanbanBoard() {
         } catch (error) {
             console.error("Failed to load logs:", error);
         }
-    };
-
-    // Toggle logs and refresh when opening
-    const toggleLogs = () => {
-        if (!showLogs) {
-            loadLogs();
-        }
-        setShowLogs(!showLogs);
     };
 
     const handleCreateTask = async (e: React.FormEvent) => {
@@ -197,6 +189,62 @@ export function KanbanBoard() {
         return (match && match[2].length === 11) ? match[2] : null;
     };
 
+    const groupLogsByTask = (logs: KanbanActivityLog[]) => {
+        return logs.reduce((acc, log) => {
+            if (!acc[log.taskId]) {
+                acc[log.taskId] = {
+                    taskId: log.taskId,
+                    taskTitle: log.taskTitle,
+                    logs: []
+                };
+            }
+            acc[log.taskId].logs.push(log);
+            return acc;
+        }, {} as Record<string, { taskId: string, taskTitle: string, logs: KanbanActivityLog[] }>);
+    };
+
+    const LogGroup = ({ group }: { group: { taskId: string, taskTitle: string, logs: KanbanActivityLog[] } }) => {
+        const [isOpen, setIsOpen] = useState(false);
+
+        return (
+            <div className="border  bg-card/50 overflow-hidden">
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="w-full flex items-center justify-between p-3 text-sm font-medium hover:bg-muted/50 transition-colors"
+                >
+                    <div className="flex items-center gap-2 truncate">
+                        {isOpen ? <ChevronDown size={14} className="text-muted-foreground" /> : <ChevronRight size={14} className="text-muted-foreground" />}
+                        <span className="truncate">{group.taskTitle}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                        {group.logs.length}
+                    </span>
+                </button>
+                {isOpen && (
+                    <div className="border-t bg-background/50 divide-y divide-border/30">
+                        {group.logs.map(log => (
+                            <div key={log.id} className="p-3 text-xs hover:bg-muted/10 transition-colors">
+                                <div className="flex justify-between items-start mb-1 gap-2">
+                                    <span className="text-muted-foreground font-mono opacity-70">
+                                        {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-semibold ${log.action === 'created' ? 'bg-green-500/10 text-green-500' :
+                                        log.action === 'deleted' ? 'bg-red-500/10 text-red-500' :
+                                            log.action === 'moved' ? 'bg-blue-500/10 text-blue-500' :
+                                                'bg-gray-500/10 text-gray-500'
+                                        }`}>
+                                        {log.action.replace('_', ' ')}
+                                    </span>
+                                </div>
+                                <p className="text-foreground/80 pl-8">{log.details}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
     const columns: { id: KanbanStatus; title: string }[] = [
         { id: "todo", title: "To Do" },
         { id: "in-progress", title: "In Progress" },
@@ -207,6 +255,8 @@ export function KanbanBoard() {
         return <div className="p-8 text-center">Loading board...</div>;
     }
 
+    const groupedLogs = groupLogsByTask(logs);
+
     return (
         <div className="h-full flex flex-col gap-6 relative">
             {/* Header */}
@@ -216,14 +266,44 @@ export function KanbanBoard() {
                     <p className="text-muted-foreground">Plan your week. Drag and drop to track progress.</p>
                 </div>
                 <div className="flex gap-2">
-                    <button
-                        onClick={toggleLogs}
-                        className="flex items-center gap-2 px-3 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 transition-colors"
-                        title="View Activity Log"
-                    >
-                        <History size={16} />
-                        History
-                    </button>
+                    <Sheet onOpenChange={(open) => { if (open) loadLogs(); }}>
+                        <SheetTrigger asChild>
+                            <button
+                                className="flex items-center gap-2 px-3 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 transition-colors"
+                                title="View Activity Log"
+                            >
+                                <History size={16} />
+                                History
+                            </button>
+                        </SheetTrigger>
+                        <SheetContent className="w-[400px] sm:w-[540px]">
+                            <SheetHeader className="">
+                                <SheetTitle>Activity Log</SheetTitle>
+                            </SheetHeader>
+                            <ScrollArea className="h-[calc(100vh-6rem)] ">
+                                <div className="space-y-3 px-5">
+                                    {logs.length === 0 ? (
+                                        <div className="text-center py-8 text-muted-foreground text-sm">
+                                            <History className="mx-auto mb-2 opacity-50" size={32} />
+                                            No activity recorded yet.
+                                        </div>
+                                    ) : (
+                                        Object.values(groupedLogs)
+                                            .sort((a, b) => {
+                                                // Sort by most recent log in the group
+                                                const latestA = Math.max(...a.logs.map(l => l.createdAt));
+                                                const latestB = Math.max(...b.logs.map(l => l.createdAt));
+                                                return latestB - latestA;
+                                            })
+                                            .map(group => (
+                                                <LogGroup key={group.taskId} group={group} />
+                                            ))
+                                    )}
+                                </div>
+                            </ScrollArea>
+                        </SheetContent>
+                    </Sheet>
+
                     <button
                         onClick={() => setIsAdding(!isAdding)}
                         className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
@@ -233,38 +313,6 @@ export function KanbanBoard() {
                     </button>
                 </div>
             </div>
-
-            {/* Activity Log Overlay */}
-            {showLogs && (
-                <div className="absolute right-0 top-16 z-50 w-80 max-h-[calc(100vh-12rem)] bg-card border shadow-lg rounded-lg flex flex-col animate-in slide-in-from-right-5 fade-in duration-200">
-                    <div className="p-3 border-b flex items-center justify-between bg-muted/30">
-                        <h3 className="font-semibold text-sm">Activity Log</h3>
-                        <button onClick={() => setShowLogs(false)} className="text-muted-foreground hover:text-foreground">
-                            <X size={14} />
-                        </button>
-                    </div>
-                    <div className="overflow-y-auto p-3 space-y-3 flex-1">
-                        {logs.length === 0 ? (
-                            <p className="text-xs text-muted-foreground text-center py-4">No recent activity.</p>
-                        ) : (
-                            logs.map(log => (
-                                <div key={log.id} className="text-xs border-b border-border/50 pb-2 last:border-0 last:pb-0">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <span className="font-medium truncate max-w-[150px]">{log.taskTitle}</span>
-                                        <span className="text-muted-foreground text-[10px]">
-                                            {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
-                                    </div>
-                                    <p className="text-muted-foreground">{log.details}</p>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                    <div className="p-2 border-t bg-muted/20 text-center">
-                        <button onClick={loadLogs} className="text-xs text-primary hover:underline">Refresh</button>
-                    </div>
-                </div>
-            )}
 
             {isAdding && (
                 <form onSubmit={handleCreateTask} className="bg-card border rounded-lg p-4 animate-in slide-in-from-top-2">
@@ -323,7 +371,7 @@ export function KanbanBoard() {
                             </span>
                         </h3>
 
-                        <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+                        <div className="flex-1 space-y-3 pr-1">
                             {tasks
                                 .filter((task) => task.status === col.id)
                                 .map((task) => (
