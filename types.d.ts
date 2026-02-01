@@ -105,6 +105,7 @@ type UserSettings = {
   notificationsEnabled: boolean;
   soundEnabled: boolean;
   theme: 'github-dark' | 'gruvbox' | 'terminal' | 'system' | 'light';
+  isBoxed: boolean;
   hasCompletedOnboarding: boolean;
 };
 

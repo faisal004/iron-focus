@@ -56,6 +56,15 @@ export function ThemeProvider({ children, defaultTheme = 'github-dark', ...props
         root.classList.add(theme);
     }, [theme]);
 
+    useEffect(() => {
+        const root = window.document.documentElement;
+        if (settings?.isBoxed) {
+            root.style.setProperty('--radius', '0rem');
+        } else {
+            root.style.removeProperty('--radius'); // Reverts to CSS default
+        }
+    }, [settings?.isBoxed]);
+
     const setTheme = (newTheme: Theme) => {
         setThemeState(newTheme);
         // Persist to backend
