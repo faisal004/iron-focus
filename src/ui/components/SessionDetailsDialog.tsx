@@ -60,13 +60,13 @@ export function SessionDetailsDialog({ isOpen, onOpenChange, date }: SessionDeta
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="h-[300px] w-full ">
+                <ScrollArea className="h-[300px] w-full  ">
                     {loading ? (
                         <div className="flex items-center justify-center h-full text-muted-foreground font-mono text-sm">
                             LOADING...
                         </div>
                     ) : sessions.length === 0 ? (
-                        <div className="flex items-center justify-center h-full text-muted-foreground font-mono text-sm">
+                        <div className="flex items-center justify-center h-[200px] text-muted-foreground font-mono text-sm">
                             NO SESSIONS RECORDED
                         </div>
                     ) : (
