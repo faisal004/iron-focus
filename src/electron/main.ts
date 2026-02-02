@@ -82,44 +82,6 @@ app.on("ready", () => {
     return true;
   });
 
-  // Mini Mode Logic
-  let isMiniMode = false;
-  let originalBounds: Electron.Rectangle | null = null;
-
-  mainWindow.on('minimize', () => {
-    // The 'minimize' event is emitted AFTER the window is minimized.
-    // It is not cancellable, so we cannot use event.preventDefault().
-    if (!isMiniMode) {
-      // Enter mini mode
-      originalBounds = mainWindow.getBounds();
-
-      // Restore the window so it is visible on screen (instead of in taskbar)
-      mainWindow.restore();
-
-      mainWindow.setMinimumSize(300, 300); // Allow shrinking
-      mainWindow.setSize(300, 300, true);
-      mainWindow.setAlwaysOnTop(true);
-
-      // Optional: remove frame? 
-      // mainWindow.setWindowButtonVisibility(false); // Valid on macOS
-      // For windows, might need setMenuBarVisibility or setSkipTaskbar
-      // mainWindow.setSkipTaskbar(true); // Maybe?
-
-      isMiniMode = true;
-      sendToRenderer(mainWindow, 'app:mini-mode', true);
-    }
-  });
-
-  ipcMainHandle('window:expand', () => {
-    if (isMiniMode && originalBounds) {
-      mainWindow.setAlwaysOnTop(false);
-      mainWindow.setBounds(originalBounds);
-      mainWindow.setMinimumSize(800, 600); // Reset min size if needed
-      isMiniMode = false;
-      sendToRenderer(mainWindow, 'app:mini-mode', false);
-    }
-  });
-
   if (isDev()) {
     mainWindow.loadURL("http://localhost:5123");
   } else {

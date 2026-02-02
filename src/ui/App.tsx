@@ -16,16 +16,16 @@ function TabPanel({ active, children }: { active: boolean; children: React.React
 function App() {
   const { settings, loading } = useSettings();
   const [activeTab, setActiveTab] = useState<'focus' | 'plan' | 'analytics'>('focus');
-  const [isMiniMode, setIsMiniMode] = useState(false);
+  // const [isMiniMode, setIsMiniMode] = useState(false);
 
   useEffect(() => {
     // Mini Mode Listener
-    const removeMiniListener = window.electron.onMiniModeChange(setIsMiniMode);
+    // const removeMiniListener = window.electron.onMiniModeChange(setIsMiniMode);
 
     // Global Hotkeys
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ctrl+Tab to switch tabs
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Tab') {
+      if (e.key === 'Tab') {
         e.preventDefault();
         setActiveTab(current => {
           if (current === 'focus') return 'plan';
@@ -38,7 +38,7 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      removeMiniListener();
+      // removeMiniListener();
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
@@ -55,13 +55,13 @@ function App() {
     return <OnboardingView />;
   }
 
-  if (isMiniMode) {
-    return (
-      <div className="w-screen h-screen bg-background overflow-hidden border-2 border-primary">
-        <PomodoroTimer mini={true} />
-      </div>
-    );
-  }
+  // if (isMiniMode) {
+  //   return (
+  //     <div className="w-screen h-screen bg-background overflow-hidden border-2 border-primary">
+  //       <PomodoroTimer mini={true} />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="w-screen h-screen bg-background flex flex-col overflow-hidden">
