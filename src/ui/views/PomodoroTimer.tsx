@@ -77,6 +77,22 @@ export function PomodoroTimer() {
         ? ((totalSeconds - state.remainingSeconds) / totalSeconds) * 100
         : 0;
 
+    useEffect(() => {
+        if (state.session?.status === 'running') {
+            if (state.isPaused) {
+                document.title = `PAUSED - GitFocus`;
+            } else {
+                document.title = `${formatTime(state.remainingSeconds)} - GitFocus`;
+            }
+        } else {
+            document.title = 'GitFocus';
+        }
+
+        return () => {
+            document.title = 'GitFocus';
+        };
+    }, [state.remainingSeconds, state.session?.status, state.isPaused]);
+
     const renderReleaseNotes = () => {
         if (!updateInfo?.releaseNotes) return "No release notes available.";
         if (typeof updateInfo.releaseNotes === 'string') {
