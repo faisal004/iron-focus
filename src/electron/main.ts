@@ -12,8 +12,10 @@ import { createBlockRuleRepository } from "./database/repositories/blockRuleRepo
 import { createCommitRepository } from "./database/repositories/commitRepository.js";
 import { createSettingsRepository } from "./database/repositories/settingsRepository.js";
 import { createKanbanRepository, KanbanTask, KanbanStatus, KanbanSubtask } from "./database/repositories/kanbanRepository.js";
+import { createUsageLogRepository, UsageLog } from "./database/repositories/usageLogRepository.js";
 import { PomodoroEngine } from "./pomodoroEngine.js";
 import { BlockingService } from "./blockingService.js";
+import { UsageTrackingService } from "./usageTrackingService.js";
 
 let tray: Tray | null = null;
 let isQuitting = false;
@@ -94,6 +96,11 @@ app.on("ready", () => {
   const commitRepo = createCommitRepository(db);
   const settingsRepo = createSettingsRepository(db);
   const kanbanRepo = createKanbanRepository(db);
+  const usageLogRepo = createUsageLogRepository(db);
+
+  // Initialize Usage Tracking Service
+  const usageTrackingService = new UsageTrackingService(usageLogRepo);
+  // usageTrackingService.startTracking(); // REMOVED: Only track during sessions
 
   // Initialize Pomodoro engine
   const pomodoroEngine = new PomodoroEngine(
@@ -106,6 +113,7 @@ app.on("ready", () => {
       },
       onCompleted: (session) => {
         blockingService.stopMonitoring();
+        usageTrackingService.stopTracking(); // Stop tracking
         ipcWebContentsSend("pomodoro:completed", mainWindow.webContents, session);
 
         // Add notification with action
@@ -120,6 +128,7 @@ app.on("ready", () => {
       },
       onFailed: (session, reason) => {
         blockingService.stopMonitoring();
+        usageTrackingService.stopTracking(); // Stop tracking
         ipcWebContentsSend("pomodoro:failed", mainWindow.webContents, { session, reason });
       },
     }
@@ -181,21 +190,25 @@ app.on("ready", () => {
   ipcMainHandleWithArgs<{ durationMinutes?: number }, PomodoroSession>("pomodoro:start", (args) => {
     const session = pomodoroEngine.start(args?.durationMinutes);
     blockingService.startMonitoring(session.id);
+    usageTrackingService.startTracking(); // Start tracking
     return session;
   });
 
   ipcMainHandle("pomodoro:stop", () => {
     blockingService.stopMonitoring();
+    usageTrackingService.stopTracking(); // Stop tracking
     return pomodoroEngine.stop();
   });
 
   ipcMainHandle("pomodoro:pause", () => {
     pomodoroEngine.pause();
+    usageTrackingService.stopTracking(); // Pause tracking (stop)
     return undefined;
   });
 
   ipcMainHandle("pomodoro:resume", () => {
     pomodoroEngine.resume();
+    usageTrackingService.startTracking(); // Resume tracking (start)
     return undefined;
   });
 
@@ -291,6 +304,15 @@ app.on("ready", () => {
 
   ipcMainHandle("kanban:getActivityLog", () => {
     return kanbanRepo.getActivityLog();
+  });
+
+  // === USAGE TRACKING IPC HANDLERS ===
+  ipcMainHandleWithArgs<{ startDate: number; endDate: number }, { appName: string; totalDuration: number }[]>("usage:getStats", (args) => {
+    return usageTrackingService.getAnalytics(new Date(args.startDate), new Date(args.endDate));
+  });
+
+  ipcMainHandleWithArgs<{ startDate: number; endDate: number }, UsageLog[]>("usage:getTimeline", (args) => {
+    return usageTrackingService.getTimeline(new Date(args.startDate), new Date(args.endDate));
   });
 
 

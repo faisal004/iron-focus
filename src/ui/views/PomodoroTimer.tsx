@@ -18,7 +18,7 @@ function formatTime(seconds: number): string {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-export function PomodoroTimer() {
+export function PomodoroTimer({ mini = false }: { mini?: boolean }) {
     const state = usePomodoroState();
     const [isStarting, setIsStarting] = useState(false);
     const [showCompletedMessage, setShowCompletedMessage] = useState(false);
@@ -71,11 +71,56 @@ export function PomodoroTimer() {
         window.electron.resumePomodoro();
     }, []);
 
+    // Space bar hotkey
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.code === 'Space') {
+                const activeTag = document.activeElement?.tagName;
+                if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
+
+                e.preventDefault();
+
+                if (!state.session) {
+                    if (!isStarting) handleStart();
+                } else {
+                    if (state.isPaused) {
+                        handleResume();
+                    } else {
+                        handlePause();
+                    }
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [state.session, state.isPaused, isStarting, handleStart, handleResume, handlePause]);
+
+    const handleExpand = () => {
+        window.electron.expandWindow();
+    };
+
     const isRunning = state.session?.status === 'running';
     const totalSeconds = (state.session?.durationMinutes ?? 25) * 60;
     const progressPercent = isRunning
         ? ((totalSeconds - state.remainingSeconds) / totalSeconds) * 100
         : 0;
+
+    useEffect(() => {
+        if (state.session?.status === 'running') {
+            if (state.isPaused) {
+                document.title = `[PAUSED] - GitFocus`;
+            } else {
+                document.title = `[${formatTime(state.remainingSeconds)}] - GitFocus`;
+            }
+        } else {
+            document.title = 'GitFocus';
+        }
+
+        return () => {
+            document.title = 'GitFocus';
+        };
+    }, [state.remainingSeconds, state.session?.status, state.isPaused]);
 
     const renderReleaseNotes = () => {
         if (!updateInfo?.releaseNotes) return "No release notes available.";
@@ -89,6 +134,45 @@ export function PomodoroTimer() {
             </div>
         ));
     };
+
+    if (mini) {
+        return (
+            <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-background text-foreground select-none pointer-events-auto">
+                {/* Drag handle area */}
+                <div className="w-full text-center text-[10px] text-muted-foreground uppercase tracking-[0.2em] mb-1 draggable cursor-move" style={{ WebkitAppRegion: 'drag' } as any}>
+                    :: MINI_MODE ::
+                </div>
+
+                <div className="text-5xl font-mono font-bold tracking-tighter tabular-nums text-primary">
+                    {formatTime(state.remainingSeconds)}
+                </div>
+
+                <div className="mt-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    {state.session ? (state.isPaused ? "PAUSED" : "FOCUSING") : "READY"}
+                </div>
+
+                <div className="flex gap-2 mt-4 w-full">
+                    {!state.session ? (
+                        <Button onClick={handleStart} size="sm" className="flex-1 text-xs uppercase font-bold border rounded-none h-8">
+                            START
+                        </Button>
+                    ) : (
+                        <>
+                            <Button onClick={state.isPaused ? handleResume : handlePause} size="sm" variant="secondary" className="flex-1 text-xs uppercase font-bold rounded-none h-8">
+                                {state.isPaused ? "RESUME" : "PAUSE"}
+                            </Button>
+                            <Button onClick={handleStop} size="sm" variant="destructive" className="flex-1 text-xs uppercase font-bold rounded-none h-8">
+                                STOP
+                            </Button>
+                        </>
+                    )}
+                    <Button onClick={handleExpand} size="sm" variant="outline" className="flex-1 text-xs uppercase font-bold rounded-none h-8">
+                        EXPAND
+                    </Button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <>

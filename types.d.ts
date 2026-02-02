@@ -91,6 +91,22 @@ type ViolationEvent = {
   gracePeriodExpired: boolean;
 };
 
+interface UsageLog {
+  id: string;
+  appName: string;
+  windowTitle: string;
+  url?: string;
+  startTime: number;
+  endTime?: number;
+  durationSeconds?: number;
+  createdAt: number;
+}
+
+interface UsageStats {
+  appName: string;
+  totalDuration: number;
+}
+
 type ActiveWindowInfo = {
   processName: string;
   windowTitle: string;
@@ -198,6 +214,14 @@ type EventPayloadMapping = {
   "kanban:updateSubtaskTitle": void;
   "kanban:deleteSubtask": void;
   "kanban:getActivityLog": KanbanActivityLog[];
+
+  // Usage Tracking
+  "usage:getStats": { appName: string; totalDuration: number }[];
+  "usage:getTimeline": UsageLog[];
+
+  // Window/App State
+  "app:mini-mode": boolean;
+  "window:expand": void;
 };
 
 interface Window {
@@ -259,6 +283,13 @@ interface Window {
     updateKanbanSubtaskTitle: (id: string, title: string) => Promise<void>;
     deleteKanbanSubtask: (id: string) => Promise<void>;
     getKanbanActivityLog: () => Promise<KanbanActivityLog[]>;
+    // Usage Tracking API
+    getUsageStats: (startDate: number, endDate: number) => Promise<UsageStats[]>;
+    getUsageTimeline: (startDate: number, endDate: number) => Promise<UsageLog[]>;
+
+    // Window/App API
+    onMiniModeChange: (callback: (isMini: boolean) => void) => UnsubscribeFunction;
+    expandWindow: () => Promise<void>;
   };
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UpdateNotification } from './UpdateNotification';
 import { PomodoroTimer } from './views/PomodoroTimer';
 import { CommitHeatmap } from './views/CommitHeatmap';
@@ -7,11 +7,41 @@ import { SettingsView } from './views/SettingsView';
 import { ModeToggle } from './components/mode-toggle';
 import { OnboardingView } from './views/OnboardingView';
 import { KanbanBoard } from './views/KanbanBoard';
+import { UsageAnalytics } from './views/UsageAnalytics';
 import { useSettings } from './hooks/useSettings';
+function TabPanel({ active, children }: { active: boolean; children: React.ReactNode }) {
+  return <div className={active ? 'block' : 'hidden'}>{children}</div>;
+}
 
 function App() {
   const { settings, loading } = useSettings();
-  const [activeTab, setActiveTab] = useState<'focus' | 'plan'>('focus');
+  const [activeTab, setActiveTab] = useState<'focus' | 'plan' | 'analytics'>('focus');
+  // const [isMiniMode, setIsMiniMode] = useState(false);
+
+  useEffect(() => {
+    // Mini Mode Listener
+    // const removeMiniListener = window.electron.onMiniModeChange(setIsMiniMode);
+
+    // Global Hotkeys
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Tab to switch tabs
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        setActiveTab(current => {
+          if (current === 'focus') return 'plan';
+          if (current === 'plan') return 'analytics';
+          return 'focus';
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      // removeMiniListener();
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -24,6 +54,14 @@ function App() {
   if (settings && !settings.hasCompletedOnboarding) {
     return <OnboardingView />;
   }
+
+  // if (isMiniMode) {
+  //   return (
+  //     <div className="w-screen h-screen bg-background overflow-hidden border-2 border-primary">
+  //       <PomodoroTimer mini={true} />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="w-screen h-screen bg-background flex flex-col overflow-hidden">
@@ -52,6 +90,15 @@ function App() {
             >
               Plan
             </button>
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`px-4 py-1.5 rounded-sm text-sm font-medium transition-all ${activeTab === 'analytics'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                }`}
+            >
+              Analytics
+            </button>
           </nav>
         </div>
         <div className="flex items-center gap-4">
@@ -63,7 +110,7 @@ function App() {
       <UpdateNotification />
 
       <main className="flex-1 overflow-auto p-4">
-        {activeTab === 'focus' ? (
+        <TabPanel active={activeTab === 'focus'}>
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-1 h-full">
               <PomodoroTimer />
@@ -76,13 +123,19 @@ function App() {
               <CommitHeatmap />
             </div>
           </div>
-        ) : (
+        </TabPanel>
+        <TabPanel active={activeTab === 'plan'}>
           <div className="max-w-6xl mx-auto h-full">
             <KanbanBoard />
           </div>
-        )}
+        </TabPanel>
+        <TabPanel active={activeTab === 'analytics'}>
+          <div className="max-w-6xl mx-auto h-full">
+            <UsageAnalytics />
+          </div>
+        </TabPanel>
       </main>
-    </div>
+    </div >
   );
 }
 

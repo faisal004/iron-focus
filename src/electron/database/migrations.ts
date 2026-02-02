@@ -99,6 +99,42 @@ const MIGRATIONS: { version: number; sql: string }[] = [
       CREATE INDEX IF NOT EXISTS idx_activity_log_created_at ON kanban_activity_log(created_at);
     `,
   },
+  {
+    version: 5,
+    sql: `
+      CREATE TABLE IF NOT EXISTS usage_logs (
+        id TEXT PRIMARY KEY,
+        app_name TEXT NOT NULL,
+        window_title TEXT NOT NULL,
+        url TEXT,
+        start_time INTEGER NOT NULL,
+        end_time INTEGER,
+        duration_seconds INTEGER,
+        created_at INTEGER NOT NULL
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_usage_logs_start_time ON usage_logs(start_time);
+      CREATE INDEX IF NOT EXISTS idx_usage_logs_app_name ON usage_logs(app_name);
+    `,
+  },
+  {
+    version: 6,
+    sql: `
+      CREATE TABLE IF NOT EXISTS usage_logs (
+        id TEXT PRIMARY KEY,
+        app_name TEXT NOT NULL,
+        window_title TEXT NOT NULL,
+        url TEXT,
+        start_time INTEGER NOT NULL,
+        end_time INTEGER,
+        duration_seconds INTEGER,
+        created_at INTEGER NOT NULL
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_usage_logs_start_time ON usage_logs(start_time);
+      CREATE INDEX IF NOT EXISTS idx_usage_logs_app_name ON usage_logs(app_name);
+    `,
+  },
 ];
 
 export function runMigrations(db: Database.Database): void {
